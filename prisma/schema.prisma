@@ -1,17 +1,328 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "sqlserver"
   url      = env("DATABASE_URL")
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Anexo {
+  IdAnexo     BigInt  @id(map: "PK_Anexo") @default(autoincrement())
+  Nombre      String  @db.VarChar(250)
+  Extension   String? @db.VarChar(8)
+  Descripcion String? @db.NVarChar(250)
+  IdImagen    String  @unique(map: "UQ__Ane__B42D8F2B14F6A844") @default(dbgenerated("newid()"), map: "DF__Anexo__IdImagen__2469202D") @db.UniqueIdentifier
+  Imagen      Bytes?
+}
+
+model Area_Experiencia {
+  Codigo      Int    @id(map: "PK_Area_Experiencia")
+  Descripcion String @db.NVarChar(80)
+}
+
+model Companias {
+  Codigo                      Int       @id(map: "PK_Companias")
+  Descripcion                 String?   @db.VarChar(80)
+  RNC                         String?   @db.NVarChar(30)
+  RNL                         String?   @db.NVarChar(10)
+  No_IDSS                     String?   @db.NVarChar(50)
+  Razon_Social                String?   @db.VarChar(80)
+  AnoInicio                   Int?      @db.SmallInt
+  NombreEmpleador             String    @db.NVarChar(100)
+  Ocupacion                   String?   @db.NVarChar(80)
+  Direccion                   String?   @db.VarChar(150)
+  ParqueZona                  String?   @db.NVarChar(80)
+  Provincia                   String?   @db.NVarChar(80)
+  Municipio                   String?   @db.NVarChar(80)
+  Sector                      String?   @db.NVarChar(80)
+  Poliza                      String?   @db.NVarChar(30)
+  Zona_Inspeccion             String?   @db.NVarChar(20)
+  Categoria                   String?   @db.NVarChar(20)
+  Delegacion                  String?   @db.NVarChar(50)
+  Delegacion_De               String?   @db.NVarChar(100)
+  Telefono                    String?   @db.NVarChar(40)
+  Fax                         String?   @db.NVarChar(40)
+  Email                       String?   @db.NVarChar(150)
+  ValorInstalaciones          Decimal?  @db.Decimal(18, 2)
+  tipo_calculo_isr            Int?      @db.TinyInt
+  salario_contribucion        Float?
+  porciento_idss              Float?
+  CUENTA_BANCARIA             String?   @db.NVarChar(40)
+  Periodo_Probatorio          Int?
+  Mensaje_General             String?   @db.NVarChar(510)
+  Sucursal                    Boolean?
+  ZonaFranca                  Boolean?
+  Volantes_Personalizados     Boolean?
+  Excluir_Cheques             Boolean?
+  Tipo_Interfase_Contable     Int?      @db.TinyInt
+  Website                     String?   @db.NVarChar(150)
+  Plaza                       String?   @db.NVarChar(80)
+  accion_personal_automatica  Int?      @db.TinyInt
+  Casa_Matriz                 String?   @db.NVarChar(20)
+  Periodo_Caducidad_Usuario   Decimal?  @db.Decimal(18, 0)
+  Tipo_Secuencia              Int?      @db.TinyInt
+  DiasRecordatorio            Int?      @db.SmallInt
+  Fecha_Calculo_Prestaciones  Int?      @default(0, map: "DF_Companias_Fecha_Calculo_Prestaciones_1")
+  DiasPorMes                  Float?    @default(0, map: "DF_Companias_DiasPorMes_1")
+  DiasVacaciones              Float?
+  Tipo_Reportes_Accion        Int?      @db.TinyInt
+  TipoInterfase_Reloj         Int?      @db.TinyInt
+  Permitirse_Aprobar_asimismo Int?
+  SupervisoresGlobales        Int?
+  FormaCalculoVacaciones      Int?      @db.TinyInt
+  Excluir_Extranjeros_TSS     Int?
+  licencia                    Int?      @default(0, map: "DF__Companias__licen__0599B4F3")
+  tipoBonificacion            Int?      @default(0, map: "DF__Companias__tipoB__068DD92C")
+  CedulaPatron                String?   @db.NVarChar(26)
+  ActualizaHoras              Int?
+  TipoPagoBonifPrestaciones   Int?
+  NoProyectarSalarioEnISR     Int?      @db.TinyInt
+  CierreFiscal                DateTime? @default(dbgenerated("2012-12-31"), map: "DF_Companias_CierreFiscal") @db.SmallDateTime
+  Tipo_Generacion             Int?      @db.SmallInt
+  Ruta_Ftp                    String?   @db.VarChar(100)
+  Ruta_Local                  String?   @db.VarChar(100)
+  Posteo                      String?   @db.VarChar(20)
+  Validacion                  String?   @db.VarChar(20)
+  Usuario_Ftp                 String?   @db.VarChar(20)
+  Contrasena_Ftp              String?   @db.VarChar(20)
+  Puerto_Ftp                  Int?      @db.SmallInt
+  Avance_Vacaciones           Int?      @db.SmallInt
+  DiasVacacionesPago          Float?
+  UrlVideo                    String?   @db.NVarChar(200)
+  Referencia                  String?   @db.VarChar(10)
+}
+
+model Idiomas {
+  Codigo      Int     @id(map: "PK_Idiomas")
+  Descripcion String? @db.NVarChar(60)
+  HROne_Code  String? @db.Char(3)
+}
+
+model MUNICIPIOS {
+  CODIGO      Int     @id(map: "PK_MUNICIPIOS")
+  DESCRIPCION String? @db.NVarChar(100)
+  IDPROVINCIA Int
+}
+
+model Nacionalidades {
+  Codigo      Int      @id(map: "PK_Nacionalidades")
+  Descripcion String?  @db.VarChar(50)
+  Defecto     Boolean?
+}
+
+model NIVEL_ACADEMICO {
+  CODIGO                Int    @id(map: "PK_NIVEL_ACADEMICO")
+  DESCRIPCION           String @db.NVarChar(50)
+  ID_Nivel_Educacion_Mt Int?
+}
+
+model Paises {
+  Codigo      Int      @id(map: "PK_Paises")
+  Descripcion String   @db.VarChar(50)
+  Defecto     Boolean?
+}
+
+model Posiciones {
+  Codigo                 Int      @id(map: "PK_Posiciones")
+  descripcion            String?  @db.VarChar(150)
+  Referencia             String?  @db.VarChar(150)
+  PermitirIngresoExtra   Int?     @db.TinyInt
+  Ano                    Int?
+  MontoEncuesta          Float?
+  Formula_SalarioHora    String?  @db.VarChar(30)
+  Codigo_Alternativo     String?  @db.VarChar(10)
+  Ruta_Documento         String?  @db.VarChar(200)
+  UrlVideo               String?  @db.VarChar(200)
+  Estatus                Boolean?
+  Intermitente           Boolean?
+  Formula_Salario_Diario String?  @db.VarChar(30)
+
+  @@index([Codigo, descripcion, Referencia, PermitirIngresoExtra, Ano, MontoEncuesta, Formula_SalarioHora, Codigo_Alternativo, Ruta_Documento, UrlVideo], map: "dta_Posiciones_01")
+}
+
+model PROVINCIAS {
+  CODIGO      Int     @id(map: "PK_PROVINCIAS_1")
+  ZONA        Int
+  DESCRIPCION String? @db.NVarChar(120)
+}
+
+model Solicitud_Empleo_Web {
+  Numero                                   Int                                        @id(map: "PK_Solicitud_Empleo_Web") @default(autoincrement())
+  Fecha_Solicitud                          DateTime?                                  @db.DateTime
+  Cedula                                   String?                                    @db.NVarChar(13)
+  Nombre                                   String?                                    @db.NVarChar(30)
+  Apellido_Paterno                         String?                                    @db.NVarChar(30)
+  Apellido_Materno                         String?                                    @db.NVarChar(30)
+  Fecha_Nacimiento                         DateTime?                                  @db.DateTime
+  Lugar_Nacimiento                         String?                                    @db.NVarChar(50)
+  Sexo                                     String?                                    @db.Char(1)
+  Estado_Civil                             String?                                    @db.Char(1)
+  Nacionalidad                             String?                                    @db.VarChar(5)
+  Direccion                                String?                                    @db.VarChar(250)
+  Sector                                   String?                                    @db.VarChar(5)
+  Provincia                                String?                                    @db.VarChar(5)
+  Municipio                                String?                                    @db.VarChar(5)
+  E_Mail                                   String?                                    @db.VarChar(100)
+  Telefono1                                String?                                    @db.VarChar(20)
+  Telefono2                                String?                                    @db.VarChar(20)
+  TieneDependiente                         String?                                    @db.VarChar(2)
+  Zona                                     String?                                    @db.VarChar(5)
+  Comentario                               String?                                    @db.VarChar(250)
+  Empleado_Nuestro                         String?                                    @db.Char(1)
+  Empleado_anteriormente                   String?                                    @db.Char(1)
+  Disponible_trabajar                      String?                                    @db.Char(1)
+  Empleado_Actualmente                     String?                                    @db.Char(1)
+  FamiliarAmigo_Empresa                    String?                                    @db.Char(1)
+  Nombre_FamiliarAmigo                     String?                                    @db.VarChar(80)
+  Posicion_aspira                          String?                                    @db.VarChar(5)
+  Salario_aspira                           Decimal?                                   @db.Decimal(18, 0)
+  Fecha_Disponible                         DateTime?                                  @db.DateTime
+  Emergencias_Nombre                       String?                                    @db.VarChar(50)
+  Emergencias_Telefono                     String?                                    @db.VarChar(20)
+  Emergencias_Direccion                    String?                                    @db.NVarChar(250)
+  Emergencias_Reaccion_Alergica            String?                                    @db.VarChar(100)
+  Emergencias_Nombre_Medico                String?                                    @db.VarChar(80)
+  Emergencias_Telefono_Medico              String?                                    @db.VarChar(20)
+  Emergencias_Tipo_Sangre                  String?                                    @db.VarChar(5)
+  Nombre1                                  String?                                    @db.VarChar(80)
+  Cia1                                     String?                                    @db.VarChar(80)
+  R_Telefono1                              String?                                    @db.VarChar(20)
+  Ocupacion1                               String?                                    @db.VarChar(50)
+  Nombre2                                  String?                                    @db.VarChar(80)
+  Cia2                                     String?                                    @db.VarChar(80)
+  R_Telefono2                              String?                                    @db.VarChar(20)
+  Ocupacion2                               String?                                    @db.VarChar(50)
+  Nombre3                                  String?                                    @db.VarChar(80)
+  Cia3                                     String?                                    @db.VarChar(80)
+  R_Telefono3                              String?                                    @db.VarChar(20)
+  Ocupacion3                               String?                                    @db.VarChar(50)
+  Pais                                     Int?
+  Telefono3                                String?                                    @db.VarChar(20)
+  Empresa_Ref1                             String?                                    @db.VarChar(80)
+  Tel_Ref_Oficina1                         String?                                    @db.VarChar(20)
+  Fecha_Inicio_Trabajo1                    DateTime?                                  @db.DateTime
+  Fecha_Termino_Trabajo1                   DateTime?                                  @db.DateTime
+  Salario_Inicial1                         Float?
+  Salario_Final1                           Float?
+  Funciones_a_su_Cargo1                    String?                                    @db.VarChar(200)
+  Puesto_Ref1                              String?                                    @db.VarChar(50)
+  Razon_Salida1                            String?                                    @db.VarChar(100)
+  Supervisor_Ref1                          String?                                    @db.VarChar(80)
+  Area_Experiencia1                        Int?
+  Competencias_Tecnicas1                   Int?
+  Empresa_Ref2                             String?                                    @db.VarChar(80)
+  Tel_Ref_Oficina2                         String?                                    @db.VarChar(20)
+  Fecha_Inicio_Trabajo2                    DateTime?                                  @db.DateTime
+  Fecha_Termino_Trabajo2                   DateTime?                                  @db.DateTime
+  Salario_Inicial2                         Float?
+  Salario_Final2                           Float?
+  Funciones_a_su_Cargo2                    String?                                    @db.VarChar(200)
+  Puesto_Ref2                              String?                                    @db.VarChar(50)
+  Razon_Salida2                            String?                                    @db.VarChar(100)
+  Supervisor_Ref2                          String?                                    @db.VarChar(80)
+  Area_Experiencia2                        Int?
+  Competencias_Tecnicas2                   Int?
+  Empresa_Ref3                             String?                                    @db.VarChar(80)
+  Tel_Ref_Oficina3                         String?                                    @db.VarChar(20)
+  Fecha_Inicio_Trabajo3                    DateTime?                                  @db.DateTime
+  Fecha_Termino_Trabajo3                   DateTime?                                  @db.DateTime
+  Salario_Inicial3                         Float?
+  Salario_Final3                           Float?
+  Funciones_a_su_Cargo3                    String?                                    @db.VarChar(200)
+  Puesto_Ref3                              String?                                    @db.VarChar(50)
+  Razon_Salida3                            String?                                    @db.VarChar(100)
+  Supervisor_Ref3                          String?                                    @db.VarChar(80)
+  Area_Experiencia3                        Int?
+  Competencias_Tecnicas3                   Int?
+  GradoAcademico                           Int?
+  FechaInicio                              DateTime?                                  @db.DateTime
+  FechaTermino                             DateTime?                                  @db.DateTime
+  CentroDocente                            Int?
+  CiudadCentroDocente                      Int?
+  Carrera                                  Int?
+  TipoContratacion                         Int?
+  AreaLaboral                              Int?
+  PreferenciaGeografica                    Int?
+  DispuestoCambioResidencia                Int?
+  ComoTeEnteraste                          Int?
+  Transferido                              Int?                                       @default(0, map: "DF_Solicitud_Empleo_Web_Transferido")
+  Horario_Disponible                       Int?
+  Dispuesto_Trabajar_Horas_Extras          Int?                                       @db.SmallInt
+  Tipo_Licencia                            Int?
+  Pasaporte                                String?                                    @db.NVarChar(25)
+  Posiciones_Puede_Aplicar                 String?                                    @db.VarChar(200)
+  Vacante_1                                Int?
+  Vacante_2                                Int?
+  Vacante_3                                Int?
+  Posee_Vehiculo                           String?                                    @db.Char(1)
+  Maneja_Motor                             String?                                    @db.Char(1)
+  Medio_Transporte                         Int?
+  Posicion_aspira2                         String?                                    @db.VarChar(5)
+  Posicion_aspira3                         String?                                    @db.VarChar(5)
+  Zona_Descripcion                         String?                                    @db.NVarChar(50)
+  Solicitud_Empleo_Web_Experiencia_Laboral Solicitud_Empleo_Web_Experiencia_Laboral[]
+  Solicitud_Empleo_Web_Formacion_Acad      Solicitud_Empleo_Web_Formacion_Acad[]
+  Solicitud_Empleo_Web_Referencias         Solicitud_Empleo_Web_Referencias[]
+}
+
+model Solicitud_Empleo_Web_Experiencia_Laboral {
+  Experiencia_Laboral_Id Int                  @id(map: "PK__Solicitu__7A51B663535206D0") @default(autoincrement())
+  Codigo_Solicitud       Int
+  Nombre_Empresa         String?              @db.NVarChar(60)
+  Telefono               String?              @db.NVarChar(20)
+  Fecha_Inicio           DateTime?            @db.Date
+  Fecha_Salida           DateTime?            @db.Date
+  Salario_Inicial        Float?
+  Salario_Final          Float?
+  Funciones_A_Cargo      String?              @db.NVarChar(Max)
+  Ultimo_Puesto          String?              @db.NVarChar(60)
+  Motivo_Salida          String?              @db.NVarChar(100)
+  Supervisor             String?              @db.NVarChar(80)
+  Area_Experiencia       Int?
+  Solicitud_Empleo_Web   Solicitud_Empleo_Web @relation(fields: [Codigo_Solicitud], references: [Numero], onUpdate: NoAction, map: "FK__Solicitud__Codig__66747478")
+}
+
+model Solicitud_Empleo_Web_Formacion_Acad {
+  Formacion_Id          Int                  @id(map: "PK__Solicitu__86CA7DCD9E45B91B") @default(autoincrement())
+  Codigo_Solicitud      Int
+  Nivel_Academico       Int
+  Fecha_Inicio          DateTime?            @db.Date
+  Fecha_Termino         DateTime?            @db.Date
+  Centro_Docente        String?              @db.NVarChar(60)
+  Ciudad_Centro_Docente String?              @db.NVarChar(60)
+  Carrera               String?              @db.NVarChar(60)
+  Solicitud_Empleo_Web  Solicitud_Empleo_Web @relation(fields: [Codigo_Solicitud], references: [Numero], onUpdate: NoAction, map: "FK__Solicitud__Codig__639807CD")
+}
+
+model Solicitud_Empleo_Web_Referencias {
+  Referencia_Id        Int                  @id(map: "PK__Solicitu__197CCCB277E9085A") @default(autoincrement())
+  Codigo_Solicitud     Int
+  Nombre               String               @db.NVarChar(80)
+  Telefono             String               @db.VarChar(20)
+  Compania             String?              @db.NVarChar(30)
+  Ocupacion            String?              @db.NVarChar(30)
+  Parentesco           String?              @db.NVarChar(30)
+  E_Mail               String?              @db.VarChar(100)
+  Tipo_Referencia      Int?
+  Solicitud_Empleo_Web Solicitud_Empleo_Web @relation(fields: [Codigo_Solicitud], references: [Numero], onUpdate: NoAction, map: "FK__Solicitud__Codig__60BB9B22")
+}
+
+model SolicitudEmpIdiomas {
+  Id              Int      @id(map: "PK_SolicitudEmpIdiomas") @default(autoincrement())
+  CodigoSolicitud Int?
+  Idioma          String?  @db.VarChar(50)
+  Lee             Boolean?
+  Escribe         Boolean?
+  Habla           Boolean?
+}
+
+model SolicitudWebAnexo {
+  ID           Int    @default(autoincrement())
+  Id_Anexo     BigInt
+  Id_Solicitud Int
+  Orden        Int    @db.TinyInt
+
+  @@id([Id_Anexo, Id_Solicitud, ID], map: "PK__Solicitu__5457575ABDD4ADF7")
 }
