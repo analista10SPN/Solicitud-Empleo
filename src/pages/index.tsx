@@ -3,11 +3,17 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { trpc } from "../utils/trpc";
 import Alert from "./components/alert";
+import Stepper from "./components/stepper";
+import parameters from "../personalization/parameters.json"
+import StepperController from "./components/stepperController";
 
 const Home: NextPage = () => {
   
   const nacionalidades = trpc.formOptions.getAllNationalities.useQuery();
   const [openInitialModal, setOpenInitialModal] = useState<boolean>(true)
+  const [currentStep, setCurrentStep] = useState<number>(1);
+
+  const steps = parameters.steps;
 
   const initialAlert = {
     title: "Indicaciones",
@@ -16,6 +22,14 @@ const Home: NextPage = () => {
       "2. Debe habilitar las ventanas emergentes en su navegador para visualizar la impresión del formulario de su solicitud."
     ]
   }
+
+   const handleClick = (direction:string) => {
+    let newStep = currentStep;
+
+    direction === "next" ? newStep++ : newStep--;
+    // check if steps are within bounds
+    newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
+  };
   
 
   return (
@@ -33,14 +47,29 @@ const Home: NextPage = () => {
        messages={initialAlert.messages} 
         />
 
+        {/* Navbar Personalizable */}
+        <div className="w-full lg:flex justify-between">
+          <img className="w-16 lg:w-32" src={"/Logo.png"} alt="Logo" />
+           <div className="w-full">
+              <Stepper steps={steps} currentStep={currentStep} stepColor={parameters.stepColor}/>
+           </div>
+           
+        </div>
+
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
-       
-        <h1 className="text-2xl font-semibold">Solicitud Empleo SPN</h1>
-        {nacionalidades?.data?.map(nacionalidad=>{
+
+        <h1 className={`text-2xl font-semibold py-6 text-[${parameters.fontColor}]`}>Solicitud Empleo {parameters.company}</h1>
+        
+        {/* Form Component */}
+        
+        {/* {nacionalidades?.data?.map(nacionalidad=>{
           if(nacionalidad.Codigo>0)
-          return <p>{nacionalidad.Descripcion}</p>
-        })}
+          return <p className="">{nacionalidad.Descripcion}</p>
+        })} */}
       </main>
+
+        <StepperController handleClick={handleClick} currentStep={currentStep} steps={parameters.steps} color={parameters.stepColor}/>
+
     </>
   );
 };

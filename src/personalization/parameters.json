@@ -1,0 +1,16 @@
+{
+    "stepColor":"#866CD1",
+    "fontColor":"#866CD1",
+    "steps":[
+    "Datos Personales",
+    "Dependientes",
+    "Experiencia Laboral",
+    "Formación Académica",
+    "Idiomas",
+    "Informaciones Adicionales",
+    "Referencias Personales",
+    "Adjuntar Documentos",
+    "Comentarios"],
+    "company":"SPN"
+
+}
