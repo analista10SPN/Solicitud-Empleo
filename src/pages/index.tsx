@@ -51,14 +51,14 @@ const Home: NextPage = () => {
         <div className="w-full lg:flex justify-between">
           <img className="w-16 lg:w-32" src={"/Logo.png"} alt="Logo" />
            <div className="w-full">
-              <Stepper steps={steps} currentStep={currentStep} stepColor={parameters.stepColor}/>
+              <Stepper steps={steps} currentStep={currentStep}/>
            </div>
            
         </div>
 
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
 
-        <h1 className={`text-2xl font-semibold py-6 text-[${parameters.fontColor}]`}>Solicitud Empleo {parameters.company}</h1>
+        <h1 className={`text-2xl font-semibold py-6 text-[color:var(--fontColor)]`}>Solicitud Empleo {parameters.company}</h1>
         
         {/* Form Component */}
         
@@ -68,7 +68,7 @@ const Home: NextPage = () => {
         })} */}
       </main>
 
-        <StepperController handleClick={handleClick} currentStep={currentStep} steps={parameters.steps} color={parameters.stepColor}/>
+        <StepperController handleClick={handleClick} currentStep={currentStep} steps={parameters.steps}/>
 
     </>
   );

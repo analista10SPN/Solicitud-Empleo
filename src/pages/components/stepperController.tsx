@@ -3,12 +3,11 @@ type stepperControllerProps = {
     handleClick : (arg0: string)=>void,
     currentStep:number,
     steps: string[],
-    color: string,
 }
 
 
 
-export default function StepperController({ handleClick, currentStep, steps, color }:stepperControllerProps) {
+export default function StepperController({ handleClick, currentStep, steps }:stepperControllerProps) {
     return (
     <div className="container mt-4 mb-8 flex justify-around">
       <button
@@ -22,7 +21,7 @@ export default function StepperController({ handleClick, currentStep, steps, col
 
       <button
         onClick={() => handleClick("next")}
-        className={`cursor-pointer rounded-lg bg-[${color}] py-2 px-4 font-semibold uppercase text-white transition duration-200 ease-in-out hover:bg-slate-700 hover:text-white`}
+        className={`cursor-pointer rounded-lg bg-[color:var(--stepperColor)] py-2 px-4 font-semibold uppercase text-white transition duration-200 ease-in-out hover:bg-slate-700 hover:text-white`}
       >
         {currentStep === steps.length ? "Enviar" : "Siguiente"}
       </button>
