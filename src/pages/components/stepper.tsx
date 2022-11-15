@@ -19,7 +19,7 @@ const Stepper = ({ steps, currentStep}:stepperProps) => {
           ...newSteps[count],
           highlighted: true,
           selected: true,
-          completed: true,
+          completed: false,
         };
         count++;
       }
@@ -67,7 +67,7 @@ const Stepper = ({ steps, currentStep}:stepperProps) => {
     setNewStep(current);
   }, [steps, currentStep]);
 
-  const stepsDisplay = newStep.map((step: { selected: any; completed: any; highlighted: any; description: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | React.ReactFragment | React.ReactPortal | null | undefined; }, index: number) => {
+  const stepsDisplay = newStep.map((step: { selected: boolean; completed: boolean; highlighted: boolean; description: string }, index: number) => {
     return (
       <div
         key={index}
@@ -82,18 +82,18 @@ const Stepper = ({ steps, currentStep}:stepperProps) => {
           <div
             className={`rounded-full transition duration-500 ease-in-out border-2 border-gray-300 h-6 w-7 flex items-center justify-center py-3  ${
               step.selected
-                ? `bg-white text-white font-bold border border-[color:var(--stepperColor)] `
+                ? `bg-white text-[color:var(--stepperColor)] font-bold border border-[color:var(--stepperColor)] `
                 : ""
             }`}
           >
             {step.completed ? (
-              <span className={`text-[color:var(--stepperColor)] font-bold text-xl`}>&#10061;</span>
+              <span className={`text-[color:var(--stepperColor)] font-bold text-xl`}>&#10003;</span>
             ) : (
               index + 1
             )}
           </div>
           {step.selected && <div
-            className={`absolute top-0 text-center mt-16 w-32 text-xs font-medium uppercase ${
+            className={`hidden lg:block absolute top-0 text-center mt-16 w-32 text-xs font-medium uppercase ${
               step.highlighted ? `text-[color:var(--stepperColor)]` : "text-gray-400"
             }`}
           >

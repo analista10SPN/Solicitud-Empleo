@@ -17,11 +17,6 @@ model Anexo {
   Imagen      Bytes?
 }
 
-model Area_Experiencia {
-  Codigo      Int    @id(map: "PK_Area_Experiencia")
-  Descripcion String @db.NVarChar(80)
-}
-
 model Companias {
   Codigo                      Int       @id(map: "PK_Companias")
   Descripcion                 String?   @db.VarChar(80)
@@ -100,22 +95,10 @@ model Idiomas {
   HROne_Code  String? @db.Char(3)
 }
 
-model MUNICIPIOS {
-  CODIGO      Int     @id(map: "PK_MUNICIPIOS")
-  DESCRIPCION String? @db.NVarChar(100)
-  IDPROVINCIA Int
-}
-
 model Nacionalidades {
   Codigo      Int      @id(map: "PK_Nacionalidades")
   Descripcion String?  @db.VarChar(50)
   Defecto     Boolean?
-}
-
-model NIVEL_ACADEMICO {
-  CODIGO                Int    @id(map: "PK_NIVEL_ACADEMICO")
-  DESCRIPCION           String @db.NVarChar(50)
-  ID_Nivel_Educacion_Mt Int?
 }
 
 model Paises {
@@ -262,13 +245,14 @@ model Solicitud_Empleo_Web {
   Posicion_aspira2                         String?                                    @db.VarChar(5)
   Posicion_aspira3                         String?                                    @db.VarChar(5)
   Zona_Descripcion                         String?                                    @db.NVarChar(50)
+  Ciudad                                   String?                                    @db.NVarChar(30)
   Solicitud_Empleo_Web_Experiencia_Laboral Solicitud_Empleo_Web_Experiencia_Laboral[]
   Solicitud_Empleo_Web_Formacion_Acad      Solicitud_Empleo_Web_Formacion_Acad[]
   Solicitud_Empleo_Web_Referencias         Solicitud_Empleo_Web_Referencias[]
 }
 
 model Solicitud_Empleo_Web_Experiencia_Laboral {
-  Experiencia_Laboral_Id Int                  @id(map: "PK__Solicitu__7A51B663535206D0") @default(autoincrement())
+  Experiencia_Laboral_Id Int                  @id(map: "PK__Solicitu__7A51B663176A26FE") @default(autoincrement())
   Codigo_Solicitud       Int
   Nombre_Empresa         String?              @db.NVarChar(60)
   Telefono               String?              @db.NVarChar(20)
@@ -285,7 +269,7 @@ model Solicitud_Empleo_Web_Experiencia_Laboral {
 }
 
 model Solicitud_Empleo_Web_Formacion_Acad {
-  Formacion_Id          Int                  @id(map: "PK__Solicitu__86CA7DCD9E45B91B") @default(autoincrement())
+  Formacion_Id          Int                  @id(map: "PK__Solicitu__86CA7DCD100BBD92") @default(autoincrement())
   Codigo_Solicitud      Int
   Nivel_Academico       Int
   Fecha_Inicio          DateTime?            @db.Date
@@ -297,7 +281,7 @@ model Solicitud_Empleo_Web_Formacion_Acad {
 }
 
 model Solicitud_Empleo_Web_Referencias {
-  Referencia_Id        Int                  @id(map: "PK__Solicitu__197CCCB277E9085A") @default(autoincrement())
+  Referencia_Id        Int                  @id(map: "PK__Solicitu__197CCCB217E88315") @default(autoincrement())
   Codigo_Solicitud     Int
   Nombre               String               @db.NVarChar(80)
   Telefono             String               @db.VarChar(20)

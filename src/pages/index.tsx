@@ -6,12 +6,15 @@ import Alert from "./components/alert";
 import Stepper from "./components/stepper";
 import parameters from "../personalization/parameters.json"
 import StepperController from "./components/stepperController";
+import { FormComponent } from "./components/Form";
 
 const Home: NextPage = () => {
   
   const nacionalidades = trpc.formOptions.getAllNationalities.useQuery();
-  const [openInitialModal, setOpenInitialModal] = useState<boolean>(true)
+
+  const [openInitialModal, setOpenInitialModal] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [canGoForward, setCanGoForward] = useState<boolean>(false);
 
   const steps = parameters.steps;
 
@@ -23,14 +26,6 @@ const Home: NextPage = () => {
     ]
   }
 
-   const handleClick = (direction:string) => {
-    let newStep = currentStep;
-
-    direction === "next" ? newStep++ : newStep--;
-    // check if steps are within bounds
-    newStep > 0 && newStep <= steps.length && setCurrentStep(newStep);
-  };
-  
 
   return (
     <>
@@ -56,19 +51,25 @@ const Home: NextPage = () => {
            
         </div>
 
-      <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
+      <main className="container mx-auto flex min-h-screen flex-col items-center p-4">
 
-        <h1 className={`text-2xl font-semibold py-6 text-[color:var(--fontColor)]`}>Solicitud Empleo {parameters.company}</h1>
+        <h1 className={`text-2xl font-semibold text-[color:var(--fontColor)] pt-4 lg:pt-8`}>Solicitud Empleo {parameters.company}</h1>
+        <p className="text-sm text-gray-500 max-w-[288px] pb-8">Llene los datos para completar su solicitud de empleo. Necesitará su cédula o pasaporte.</p>
         
         {/* Form Component */}
+
+        <FormComponent step={currentStep} setCurrentStep={setCurrentStep}/>
         
         {/* {nacionalidades?.data?.map(nacionalidad=>{
           if(nacionalidad.Codigo>0)
           return <p className="">{nacionalidad.Descripcion}</p>
         })} */}
+
+        
+
       </main>
 
-        <StepperController handleClick={handleClick} currentStep={currentStep} steps={parameters.steps}/>
+       
 
     </>
   );
