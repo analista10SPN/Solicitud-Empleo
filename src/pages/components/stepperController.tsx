@@ -21,7 +21,7 @@ export default function StepperController({ handleClick, currentStep, steps }:st
 
       {currentStep < steps.length &&
       <button
-        onClick={(e) => {e.preventDefault() ; handleClick("next")}}
+        type="submit"
         className={`cursor-pointer rounded-lg bg-[color:var(--stepperColor)] py-2 px-4 font-semibold uppercase text-white transition duration-200 ease-in-out hover:bg-slate-700 hover:text-white`}
       >
         Siguiente

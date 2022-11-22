@@ -1,20 +1,15 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState, useEffect } from "react";
-import { trpc } from "../utils/trpc";
+import { useState } from "react";
 import Alert from "./components/alert";
 import Stepper from "./components/stepper";
 import parameters from "../personalization/parameters.json"
-import StepperController from "./components/stepperController";
 import { FormComponent } from "./components/Form";
 
 const Home: NextPage = () => {
   
-  const nacionalidades = trpc.formOptions.getAllNationalities.useQuery();
-
   const [openInitialModal, setOpenInitialModal] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<number>(1);
-  const [canGoForward, setCanGoForward] = useState<boolean>(false);
 
   const steps = parameters.steps;
 

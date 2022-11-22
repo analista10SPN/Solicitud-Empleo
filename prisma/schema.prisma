@@ -310,3 +310,29 @@ model SolicitudWebAnexo {
 
   @@id([Id_Anexo, Id_Solicitud, ID], map: "PK__Solicitu__5457575ABDD4ADF7")
 }
+
+model Solicitud_Empleo_Web_Dependientes {
+  ID               Int       @default(autoincrement())
+  Codigo_Solicitud Int
+  Nombre           String?   @db.NVarChar(80)
+  Fecha_Nacimiento DateTime? @db.DateTime
+  Genero           Int?      @default(1, map: "DF__Solicitud__Gener__0AA4EDB4") @db.TinyInt
+  Id_Parentesco    Int?      @db.TinyInt
+  IncluirEnPBS     Int?      @default(0, map: "DF_Solicitud_Empleo_Web_Dependientes_IncluirEnPBS") @db.TinyInt
+  NivelAcademico   Int?
+  Fecha_Inclusion  DateTime? @db.DateTime
+  Cedula           String?   @db.VarChar(13)
+  Fecha_Exclusion  DateTime? @db.DateTime
+
+  @@id([Codigo_Solicitud, ID], map: "PK_Solicitud_Empleo_Web_Dependientes")
+}
+
+model NIVEL_ACADEMICO_WEB {
+  CODIGO      Int     @id(map: "PK_NIVEL_ACADEMICO_WEB")
+  DESCRIPCION String? @db.NVarChar(40)
+}
+
+model Parentesco {
+  Parentesco_Codigo Int     @id(map: "PK_Parentesco")
+  Descripcion       String? @db.VarChar(20)
+}
