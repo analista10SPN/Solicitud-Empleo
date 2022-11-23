@@ -22,7 +22,7 @@ interface dependientesProps {
 
 const schema = z.object({
   nombre: string().min(1,{message:"El nombre es requerido"}),
-  cedula:string().regex(/^$|^[0-9]{3}?-?[0-9]{7}?-?[0-9]{1}?$/g,{message:"Debe indicar una cédula válida"}),
+  cedula:string().regex(/^$|^[0-9]{3}?-?[0-9]{7}?-?[0-9]{1}?$/g,{message:"Debe indicar una cédula válida (opcional)"}),
   sexo:string({invalid_type_error:"Debe indicar su sexo"}).min(1),
   nivelAcademico:object({
   label: string(),

@@ -66,7 +66,9 @@ interface datosPersonalesProps {
 
 export const DatosPersonales = ({ step, setCurrentStep,results, setResults}:datosPersonalesProps) => {
 
+
   const {register, handleSubmit, formState: { errors }, control, watch} = useForm({
+    defaultValues:JSON.parse(JSON.stringify(results)),
     resolver: zodResolver(schema)
   });
 
