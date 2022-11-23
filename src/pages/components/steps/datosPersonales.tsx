@@ -1,12 +1,12 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { Dispatch, SetStateAction, useState } from 'react'
-import Select, { OptionsOrGroups } from 'react-select'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React, { Dispatch, SetStateAction, useState } from 'react';
+import Select from 'react-select';
 import { faPhone, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { trpc } from '../../../utils/trpc';
-import { FieldValues, UseFormRegister, useController, Control, Controller, UseFormWatch, UseFormSetValue, FieldErrorsImpl } from 'react-hook-form';
+import {  Controller } from 'react-hook-form';
 import InputMask from "react-input-mask";
 import StepperController from '../stepperController';
-import parameters from '../../../personalization/parameters.json'
+import parameters from '../../../personalization/parameters.json';
 import { useForm } from 'react-hook-form';
 import {zodResolver} from "@hookform/resolvers/zod";
 import { literal, number, object, string, z} from "zod";

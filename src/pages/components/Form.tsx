@@ -15,13 +15,14 @@ export const FormComponent = ({step, setCurrentStep}:formProps) => {
   }
 
   const [results, setResults] = useState<keyable>({})
+  const [dependientes, setDependientes] = useState<keyable[]>([])
   
   // console.log("RESULTS:",results['tieneDependiente']['label'])
 
  const formContent = () =>{ 
   switch(step){
     case 1: return <DatosPersonales step={step} setCurrentStep={setCurrentStep} results={results} setResults={setResults}/>
-    case 2: return <Dependientes step={step} setCurrentStep={setCurrentStep} results={results} setResults={setResults} />
+    case 2: return <Dependientes step={step} setCurrentStep={setCurrentStep} dependientes={dependientes} setDependientes={setDependientes} />
     case 3: return <div className='text-xl'> TO BE ADDED... </div>
     case 4: return <div className='text-xl'> TO BE ADDED... </div>
     case 5: return <div className='text-xl'> TO BE ADDED... </div>
