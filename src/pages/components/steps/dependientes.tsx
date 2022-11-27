@@ -7,6 +7,7 @@ import parameters from '../../../personalization/parameters.json'
 import StepperController from '../stepperController';
 import Select from 'react-select';
 import InputMask from "react-input-mask";
+import { TableComponent } from '../tableComponent';
 
  interface keyable {
     [key: string]: any  
@@ -15,15 +16,18 @@ import InputMask from "react-input-mask";
 interface dependientesProps {
   step:number,
   setCurrentStep: Dispatch<SetStateAction<number>>,
-  dependientes:keyable[],
-  setDependientes: Dispatch<React.SetStateAction<keyable[]>>,
+  dependientes:any[],
+  setDependientes: Dispatch<React.SetStateAction<any[]>>,
 
 }
 
 const schema = z.object({
   nombre: string().min(1,{message:"El nombre es requerido"}),
   cedula:string().regex(/^$|^[0-9]{3}?-?[0-9]{7}?-?[0-9]{1}?$/g,{message:"Debe indicar una cédula válida (opcional)"}),
-  sexo:string({invalid_type_error:"Debe indicar su sexo"}).min(1),
+  sexo:object({
+  label: string(),
+  value: string(),
+},{required_error:"Debe indicar el sexo"}),
   nivelAcademico:object({
   label: string(),
   value: number(),
@@ -35,11 +39,22 @@ const schema = z.object({
 },{required_error:"Debe indicar el parentesco"}),
 })
 
+// export type dependienteType = {
+//    nombre: string,
+//   cedula:string,
+//   sexo:string,
+//   nivelAcademico:{label:string, value:number},
+//   fechaNacimiento:string,
+//   parentesco:{label:string, value:number},
+// }
+
 export const Dependientes = ({ step, setCurrentStep,dependientes, setDependientes}:dependientesProps) => {
  
     const {register, handleSubmit, formState: { errors }, control, watch} = useForm({
     resolver: zodResolver(schema)
   });
+
+    
 
     const watchFields = watch(["cedula"])
 
@@ -54,6 +69,8 @@ export const Dependientes = ({ step, setCurrentStep,dependientes, setDependiente
     const nivelesAcademicosOpciones: Object[] = []
 
     const parentescosOpciones: Object[] = []
+
+    const sexoOpciones = [{label:'Femenino', value: '1'},{label:'Masculino',value:'2'}]
 
     //FILLING IN MENU OPTIONS VARIABLES WITH DATA
 
@@ -179,27 +196,16 @@ export const Dependientes = ({ step, setCurrentStep,dependientes, setDependiente
 
         <div className='lg:flex p-2 justify-between lg:pt-6'>
 
-            <div className='block'> 
+              <div className='block justify-start'> 
                 <p className='text-[color:var(--fontColor)] text-md'>Sexo <b className='text-red-500'>*</b></p>
-                
-                <div className='flex'>
-                <label className="inline-flex items-center pt-1">
-                  <input type="radio" 
-                  {...register("sexo")}
-                  value={'1'} className='accent-[color:var(--stepperColor)]' />
-                  <span className="ml-2">Femenino</span>
-                </label>
-
-                <label className="inline-flex items-center pt-1 pl-3">
-                  <input type="radio" 
-                  {...register("sexo")}
-                  value={'2'} className='accent-[color:var(--stepperColor)]' />
-                  <span className="ml-2">Masculino</span>
-                </label>
+                <Controller name='sexo' control={control} render={({field})=>(
+                    <Select placeholder='Seleccione...' 
+                    className='w-full lg:w-60 pt-1 focus:outline-0 outline-none border-0' 
+                    {...field} 
+                    options={sexoOpciones}/>
+                )} />
+                {errors?.sexo && <span className='text-red-500 text-sm block'>{errors.sexo.message?.toString()}</span>}
                 </div>
-                 {errors?.sexo && <span className='text-red-500 text-sm block'>{errors.sexo.message?.toString()}</span>}
-
-                 </div>
             
               <div className='hidden pt-4 lg:pt-0'> 
                 <p className='text-[color:var(--fontColor)] text-md'>TO BE ADDED <b className='text-red-500'>*</b></p>
@@ -210,14 +216,37 @@ export const Dependientes = ({ step, setCurrentStep,dependientes, setDependiente
 
         {/* ROW 5 */}
 
-          <div className='lg:flex p-2 justify-between lg:pt-6'>
-
+          <div className='flex justify-end p-2 lg:pt-6'>
+            <button type='submit'
+             className=' rounded-full hover:shadow-md shadow shadow-gray-800 hover:shadow-gray-700 pb-1 text-2xl w-9 h-9 text-white bg-[color:var(--stepperColor)]'>&#43;
+             </button>
          
 
         </div>
 
         </div>
-        <StepperController steps={parameters.steps} currentStep={step} handleClick={handleClick}></StepperController>
+        {/* Table Component */}
+        {(nivelesAcademicosOpciones.length > 0 && dependientes.length > 0) && <TableComponent data={dependientes} setData={setDependientes} columnProps={
+          [{name:"Nombre",property:"nombre"},
+          {name:"Fecha Nacimiento",property:"fechaNacimiento"},
+          {name:"Nivel Académico",property:"nivelAcademico.value"},
+          {name:"Parentesco",property:"parentesco.value"},
+          {name:"Cédula",property:"cedula"},
+          {name:"Sexo",property:"sexo.value"}]
+        } 
+        selectOptions={[{
+          id:"nivelAcademico",
+          optionsArray: nivelesAcademicosOpciones
+        },
+        {
+          id:"parentesco",
+          optionsArray: parentescosOpciones
+        },
+        {
+          id:"sexo",
+          optionsArray: sexoOpciones
+        }]}/>}
+        <StepperController steps={parameters.steps} currentStep={step} handleClick={handleClick} submit={false}></StepperController>
         </form>
   )
 }

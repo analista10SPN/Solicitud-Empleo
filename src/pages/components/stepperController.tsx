@@ -3,12 +3,14 @@ type stepperControllerProps = {
     handleClick : (arg0: string)=>void,
     currentStep:number,
     steps: string[],
+    submit: boolean,
 }
 
 
 
-export default function StepperController({ handleClick, currentStep, steps }:stepperControllerProps) {
-    return (
+export default function StepperController({ handleClick, currentStep, steps, submit }:stepperControllerProps) {
+  
+  return (
     <div className="container mt-4 mb-8 flex justify-around">
       <button
         onClick={(e) => { e.preventDefault() ;handleClick("back")}}
@@ -21,7 +23,11 @@ export default function StepperController({ handleClick, currentStep, steps }:st
 
       {currentStep < steps.length &&
       <button
-        type="submit"
+        type={`${submit ? "submit" : "button"}`}
+        onClick={()=>{
+          if(!submit)
+          handleClick('next')
+        }}
         className={`cursor-pointer rounded-lg bg-[color:var(--stepperColor)] py-2 px-4 font-semibold uppercase text-white transition duration-200 ease-in-out hover:bg-slate-700 hover:text-white`}
       >
         Siguiente

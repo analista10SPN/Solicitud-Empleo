@@ -15,7 +15,7 @@ export const FormComponent = ({step, setCurrentStep}:formProps) => {
   }
 
   const [results, setResults] = useState<keyable>({})
-  const [dependientes, setDependientes] = useState<keyable[]>([])
+  const [dependientes, setDependientes] = useState<any>([])
   
   // console.log("RESULTS:",results['tieneDependiente']['label'])
 

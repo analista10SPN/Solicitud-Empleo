@@ -503,7 +503,7 @@ export const DatosPersonales = ({ step, setCurrentStep,results, setResults}:dato
         </div>
 
         </div>
-        <StepperController steps={parameters.steps} currentStep={step} handleClick={handleClick}></StepperController>
+        <StepperController steps={parameters.steps} currentStep={step} handleClick={handleClick} submit={true}></StepperController>
         </form>
   )
 }
