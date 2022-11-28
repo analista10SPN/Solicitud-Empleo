@@ -4,7 +4,7 @@ import { z } from "zod";
 export const exampleRouter = router({
   hello: publicProcedure
     .input(z.object({ text: z.string().nullish() }).nullish())
-    .query(({ input }) => {
+    .mutation(({ input }) => {
       return {
         greeting: `Hello ${input?.text ?? "world"}`,
       };

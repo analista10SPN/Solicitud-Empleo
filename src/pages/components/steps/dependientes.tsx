@@ -39,14 +39,7 @@ const schema = z.object({
 },{required_error:"Debe indicar el parentesco"}),
 })
 
-// export type dependienteType = {
-//    nombre: string,
-//   cedula:string,
-//   sexo:string,
-//   nivelAcademico:{label:string, value:number},
-//   fechaNacimiento:string,
-//   parentesco:{label:string, value:number},
-// }
+
 
 export const Dependientes = ({ step, setCurrentStep,dependientes, setDependientes}:dependientesProps) => {
  
