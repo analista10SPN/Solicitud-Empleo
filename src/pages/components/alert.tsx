@@ -49,7 +49,7 @@ function Alert({ open, title, messages, setClose }: alertProps) {
               </button>
             </div>
             {/* <!-- Modal body --> */}
-            <div className="space-y-6 p-6">
+            <div className="space-y-6 p-6 text-left">
               {messages.map((message, index) => {
                 return (
                   <p
@@ -62,7 +62,7 @@ function Alert({ open, title, messages, setClose }: alertProps) {
               })}
             </div>
             {/* Modal Footer */}
-            <div className="flex items-center space-x-2 rounded-b border-t border-gray-200 p-6 dark:border-gray-600">
+            <div className="flex items-center space-x-2 rounded-b border-t border-gray-200 px-6 py-4 dark:border-gray-600">
               <button
                 onClick={setClose}
                 data-modal-toggle="defaultModal"

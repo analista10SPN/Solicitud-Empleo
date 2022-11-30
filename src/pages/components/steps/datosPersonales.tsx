@@ -10,6 +10,7 @@ import parameters from "../../../personalization/parameters.json";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { literal, number, object, string, z } from "zod";
+import Alert from "../alert";
 
 const edadMinima = 16;
 
@@ -106,6 +107,7 @@ export default function DatosPersonales({
   });
 
   const [termsAndConditions, setTermsAndConditions] = useState<boolean>(false);
+  const [openTermsModal, setOpenTermsModal] = useState<boolean>(false);
 
   const estadoCivilOpciones = [
     { value: 1, label: "Soltero(a)" },
@@ -223,8 +225,17 @@ export default function DatosPersonales({
         }}
         className="mr-4 h-4 w-4 rounded-md border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
       />
+      <Alert
+        open={openTermsModal}
+        title={"Términos y Condiciones"}
+        messages={[parameters.termsText]}
+        setClose={() => setOpenTermsModal(false)}
+      />
       Estoy de acuerdo con los
-      <span className="cursor-pointer font-semibold text-blue-500 hover:text-blue-700">
+      <span
+        className="cursor-pointer font-semibold text-blue-500 hover:text-blue-700"
+        onClick={() => setOpenTermsModal(true)}
+      >
         {" "}
         Términos de uso
       </span>
