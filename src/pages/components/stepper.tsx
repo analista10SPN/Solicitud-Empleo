@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 
 type stepperProps = {
-  steps: string[],
-  currentStep : number,
-}
+  steps: string[];
+  currentStep: number;
+};
 
-const Stepper = ({ steps, currentStep}:stepperProps) => {
+const Stepper = ({ steps, currentStep }: stepperProps) => {
   const [newStep, setNewStep] = useState<any>([]);
-  const stepsRef = useRef<Object>();
+  const stepsRef = useRef<unknown>();
 
-  const updateStep = (stepNumber:number, steps:any) => {
+  const updateStep = (stepNumber: number, steps: string[] | any) => {
     const newSteps = [...steps];
     let count = 0;
     while (count < newSteps.length) {
@@ -50,7 +50,7 @@ const Stepper = ({ steps, currentStep}:stepperProps) => {
   };
 
   useEffect(() => {
-    const stepsState = steps.map((step, index) =>
+    const stepsState = steps?.map((step, index) =>
       Object.assign(
         {},
         {
@@ -67,50 +67,75 @@ const Stepper = ({ steps, currentStep}:stepperProps) => {
     setNewStep(current);
   }, [steps, currentStep]);
 
-  const stepsDisplay = newStep.map((step: { selected: boolean; completed: boolean; highlighted: boolean; description: string }, index: number) => {
-    return (
-      <div
-        key={index}
-        className={
-          index !== newStep.length - 1
-            ? "w-full flex items-center"
-            : "flex items-center"
-        }
-      >
-        <div className={`relative flex flex-col items-center text-[color:var(--stepperColor)]`}>
-         <p> {index+1}/{newStep.length}</p>
+  const stepsDisplay = newStep?.map(
+    (
+      step: {
+        selected: boolean;
+        completed: boolean;
+        highlighted: boolean;
+        description: string;
+      },
+      index: number
+    ) => {
+      return (
+        <div
+          key={index}
+          className={
+            index !== newStep.length - 1
+              ? "flex w-full items-center"
+              : "flex items-center"
+          }
+        >
           <div
-            className={`rounded-full transition duration-500 ease-in-out border-2 border-gray-300 h-6 w-7 flex items-center justify-center py-3  ${
-              step.selected
-                ? `bg-white text-[color:var(--stepperColor)] font-bold border border-[color:var(--stepperColor)] `
-                : ""
-            }`}
+            className={`relative flex flex-col items-center text-[color:var(--stepperColor)]`}
           >
-            {step.completed ? (
-              <span className={`text-[color:var(--stepperColor)] font-bold text-xl`}>&#10003;</span>
-            ) : (
-              index + 1
+            <p>
+              {" "}
+              {index + 1}/{newStep.length}
+            </p>
+            <div
+              className={`flex h-6 w-7 items-center justify-center rounded-full border-2 border-gray-300 py-3 transition duration-500 ease-in-out  ${
+                step.selected
+                  ? `border border-[color:var(--stepperColor)] bg-white font-bold text-[color:var(--stepperColor)] `
+                  : ""
+              }`}
+            >
+              {step.completed ? (
+                <span
+                  className={`text-xl font-bold text-[color:var(--stepperColor)]`}
+                >
+                  &#10003;
+                </span>
+              ) : (
+                index + 1
+              )}
+            </div>
+            {step.selected && (
+              <div
+                className={`absolute top-0 mt-16 hidden w-32 text-center text-xs font-medium uppercase lg:block ${
+                  step.highlighted
+                    ? `text-[color:var(--stepperColor)]`
+                    : "text-gray-400"
+                }`}
+              >
+                {step.description}
+              </div>
             )}
           </div>
-          {step.selected && <div
-            className={`hidden lg:block absolute top-0 text-center mt-16 w-32 text-xs font-medium uppercase ${
-              step.highlighted ? `text-[color:var(--stepperColor)]` : "text-gray-400"
-            }`}
-          >
-            {step.description}
-          </div>}
+          <div
+            className={`mb-[-20px] flex-auto border-t-2 transition duration-500 ease-in-out  ${
+              step.completed
+                ? `border-[color:var(--stepperColor)]`
+                : "border-gray-300 "
+            }  `}
+          ></div>
         </div>
-        <div
-          className={`mb-[-20px] flex-auto border-t-2 transition duration-500 ease-in-out  ${
-            step.completed ? `border-[color:var(--stepperColor)]` : "border-gray-300 "
-          }  `}
-        ></div>
-      </div>
-    );
-  });
+      );
+    }
+  );
 
   return (
-    <div className="mx-8 p-4 flex justify-between items-center">
+    <div className="mx-8 flex items-center justify-between p-4">
       {stepsDisplay}
     </div>
   );

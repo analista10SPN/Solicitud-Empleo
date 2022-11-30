@@ -3,11 +3,10 @@ import Head from "next/head";
 import { useState } from "react";
 import Alert from "./components/alert";
 import Stepper from "./components/stepper";
-import parameters from "../personalization/parameters.json"
-import { FormComponent } from "./components/Form";
+import parameters from "../personalization/parameters.json";
+import FormComponent from "./components/Form";
 
 const Home: NextPage = () => {
-  
   const [openInitialModal, setOpenInitialModal] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<number>(1);
 
@@ -17,10 +16,9 @@ const Home: NextPage = () => {
     title: "Indicaciones",
     messages: [
       "1. Los campos marcados con asterisco (*) son obligatorios y deben ser llenados para enviar la solicitud.",
-      "2. Debe habilitar las ventanas emergentes en su navegador para visualizar la impresión del formulario de su solicitud."
-    ]
-  }
-
+      "2. Debe habilitar las ventanas emergentes en su navegador para visualizar la impresión del formulario de su solicitud.",
+    ],
+  };
 
   return (
     <>
@@ -30,46 +28,46 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-       <Alert data-modal-toggle={"defaultModal"} 
-       setClose={()=>{setOpenInitialModal(false)}} 
-       open={openInitialModal} 
-       title={initialAlert.title} 
-       messages={initialAlert.messages} 
-        />
+      <Alert
+        data-modal-toggle={"defaultModal"}
+        setClose={() => {
+          setOpenInitialModal(false);
+        }}
+        open={openInitialModal}
+        title={initialAlert.title}
+        messages={initialAlert.messages}
+      />
 
-        {/* Navbar Personalizable */}
-        <div className="w-full lg:flex justify-between">
-          <img className="w-16 lg:w-32" src={"/Logo.png"} alt="Logo" />
-           <div className="w-full">
-              <Stepper steps={steps} currentStep={currentStep}/>
-           </div>
-           
+      {/* Navbar Personalizable */}
+      <div className="w-full justify-between lg:flex">
+        <img className="w-16 lg:w-32" src={"/Logo.png"} alt="Logo" />
+        <div className="w-full">
+          <Stepper steps={steps} currentStep={currentStep} />
         </div>
+      </div>
 
       <main className="container mx-auto flex min-h-screen flex-col items-center p-4">
+        <h1
+          className={`pt-4 text-2xl font-semibold text-[color:var(--fontColor)] lg:pt-8`}
+        >
+          Solicitud Empleo {parameters.company}
+        </h1>
+        <p className="max-w-[288px] pb-8 text-sm text-gray-500">
+          Llene los datos para completar su solicitud de empleo. Necesitará su
+          cédula o pasaporte.
+        </p>
 
-        <h1 className={`text-2xl font-semibold text-[color:var(--fontColor)] pt-4 lg:pt-8`}>Solicitud Empleo {parameters.company}</h1>
-        <p className="text-sm text-gray-500 max-w-[288px] pb-8">Llene los datos para completar su solicitud de empleo. Necesitará su cédula o pasaporte.</p>
-        
         {/* Form Component */}
 
-        <FormComponent step={currentStep} setCurrentStep={setCurrentStep}/>
-        
+        <FormComponent step={currentStep} setCurrentStep={setCurrentStep} />
+
         {/* {nacionalidades?.data?.map(nacionalidad=>{
           if(nacionalidad.Codigo>0)
           return <p className="">{nacionalidad.Descripcion}</p>
         })} */}
-
-        
-
       </main>
-
-       
-
     </>
   );
 };
 
 export default Home;
-
-

@@ -1,16 +1,17 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
 import StepperController from "./stepperController";
-import { DatosPersonales } from "./steps/datosPersonales";
-import { Dependientes } from "./steps/dependientes";
+import DatosPersonales from "./steps/datosPersonales";
+import Dependientes from "./steps/dependientes";
 import parameters from "../../personalization/parameters.json";
 import { trpc } from "../../utils/trpc";
+import Sent from "./sent";
 
 interface formProps {
   step: number;
   setCurrentStep: Dispatch<SetStateAction<number>>;
 }
 
-export const FormComponent = ({ step, setCurrentStep }: formProps) => {
+export default function FormComponent({ step, setCurrentStep }: formProps) {
   interface keyable {
     [key: string]: any;
   }
@@ -179,11 +180,11 @@ export const FormComponent = ({ step, setCurrentStep }: formProps) => {
           </div>
         );
       case 10:
-        return <div>Enviado</div>;
+        return <Sent email={results?.email} />;
       default:
         return <div></div>;
     }
   };
 
   return <>{formContent()}</>;
-};
+}

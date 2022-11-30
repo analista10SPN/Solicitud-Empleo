@@ -1,4 +1,4 @@
-import React, { SetStateAction, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 
 import Select, { OptionsOrGroups } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,7 +26,7 @@ type columnProperties = {
 };
 
 interface tableProps {
-  data: Object[];
+  data: Record<string, unknown>[];
   setData: any;
   columnProps: columnProperties[];
   selectOptions: any;
@@ -43,28 +43,28 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export const TableComponent = ({
+export default function TableComponent({
   data,
   setData,
   columnProps,
   selectOptions,
-}: tableProps) => {
+}: tableProps) {
   const deleteRow = (index: number) => {
-    let popElement = data.at(index);
-    let dataAux = data.filter((element) => {
+    const popElement = data.at(index);
+    const dataAux = data.filter((element) => {
       return element !== popElement;
     });
 
     setData(dataAux);
   };
 
-  const defaultColumn: Partial<ColumnDef<Object>> = {
-    cell: ({ getValue, row: { index }, column: { id }, table }) => {
-      try {
-        getValue();
-      } catch {
-        return;
-      }
+  const defaultColumn: Partial<ColumnDef<any>> = {
+    cell: function Cell({ getValue, row: { index }, column: { id }, table }) {
+      // try {
+      //   getValue();
+      // } catch {
+      //   return;
+      // }
       const initialValue = getValue();
 
       let dataType = "text";
@@ -87,18 +87,18 @@ export const TableComponent = ({
       }
       console.log(
         "DATA SPLIT TO DATE TRY:",
-        String(initialValue).split("/").length
+        String(initialValue)?.split("/")?.length
       );
       if (
-        String(initialValue).split("-")[0]?.length === 4 &&
-        String(initialValue).split("-")[1]?.length === 2 &&
-        String(initialValue).split("-")[2]?.length === 2
+        String(initialValue)?.split("-")[0]?.length === 4 &&
+        String(initialValue)?.split("-")[1]?.length === 2 &&
+        String(initialValue)?.split("-")[2]?.length === 2
       ) {
         dataType = "date";
       }
 
       // We need to keep and update the state of the cell normally
-      const [value, setValue] = React.useState(initialValue);
+      const [value, setValue] = useState(initialValue);
 
       // When the input is blurred, we'll call our table meta's updateData function
       const onBlur = () => {
@@ -106,7 +106,7 @@ export const TableComponent = ({
       };
 
       // If the initialValue is changed external, sync it up with our state
-      React.useEffect(() => {
+      useEffect(() => {
         setValue(initialValue);
       }, [initialValue]);
 
@@ -120,10 +120,10 @@ export const TableComponent = ({
             onChange={(e) => {
               if (
                 dataType === "date" &&
-                e.target.value.split("-").length !== 3
+                e?.target?.value?.split("-")?.length !== 3
               ) {
                 return;
-              } else if (e.target.value.length === 0) {
+              } else if (e?.target?.value?.length === 0) {
                 return;
               }
               setValue(e.target.value);
@@ -153,17 +153,17 @@ export const TableComponent = ({
 
   console.log("DATA:", data);
 
-  const columns = React.useMemo<ColumnDef<Object>[]>(
+  const columns = React.useMemo<ColumnDef<any>[]>(
     () => [
       {
         header: "",
         id: "1",
         footer: (props) => props.column.id,
-        columns: columnProps.map((column) => {
+        columns: columnProps?.map((column) => {
           return {
-            id: column.property,
-            accessorKey: column.property,
-            header: () => <span>{column.name}</span>,
+            id: column?.property,
+            accessorKey: column?.property,
+            header: () => <span>{column?.name}</span>,
             // footer: props => props.column.id,
           };
         }),
@@ -182,7 +182,7 @@ export const TableComponent = ({
       updateData: (rowIndex, columnId, value, isSelect) => {
         // Skip age index reset until after next rerender
         setData((old: any) =>
-          old.map((row: any, index: number) => {
+          old?.map((row: any, index: number) => {
             if (index === rowIndex) {
               let columnString: any = columnId;
               if (columnId.split(".")[1] === "value") {
@@ -198,7 +198,6 @@ export const TableComponent = ({
         );
       },
     },
-    debugTable: true,
   });
 
   return (
@@ -206,9 +205,9 @@ export const TableComponent = ({
       <div className="h-2 w-72 lg:w-[40rem]" />
       <table>
         <thead className="bg-[color:var(--stepperColor)] text-white">
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups()?.map((headerGroup) => (
             <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
+              {headerGroup.headers?.map((header) => {
                 return (
                   <th key={header.id} colSpan={header.colSpan}>
                     {header.isPlaceholder ? null : (
@@ -226,12 +225,12 @@ export const TableComponent = ({
           ))}
         </thead>
         <tbody className="bg-gray-200">
-          {table.getRowModel().rows.map((row) => {
+          {table.getRowModel()?.rows?.map((row) => {
             return (
-              <tr key={row.id}>
-                {row.getVisibleCells().map((cell) => {
+              <tr key={row?.id}>
+                {row.getVisibleCells()?.map((cell) => {
                   return (
-                    <td className="text-center" key={cell.id}>
+                    <td className="text-center" key={cell?.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -243,7 +242,7 @@ export const TableComponent = ({
                   <button
                     onClick={(e) => {
                       e.preventDefault();
-                      deleteRow(row.index);
+                      deleteRow(row?.index);
                     }}
                   >
                     {" "}
@@ -261,4 +260,4 @@ export const TableComponent = ({
       <div className="h-2" />
     </div>
   );
-};
+}
