@@ -337,3 +337,26 @@ model Parentesco {
   Parentesco_Codigo Int     @id(map: "PK_Parentesco")
   Descripcion       String? @db.VarChar(20)
 }
+
+model Area_Experiencia_WEB {
+  Codigo      Int    @id(map: "PK_Area_Experiencia_WEB")
+  Descripcion String @db.NVarChar(80)
+}
+
+model CIUDADES_WEB {
+  Codigo      Int    @id(map: "PK_CIUDADES_WEB_1")
+  Descripcion String @db.NVarChar(60)
+}
+
+model MUNICIPIOS_WEB {
+  CODIGO      Int     @id(map: "PK_MUNICIPIOS_WEB")
+  DESCRIPCION String? @db.NVarChar(100)
+  IDPROVINCIA Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model ZONAS_WEB {
+  CODIGO      Int     @id(map: "PK_ZONAS_WEB") @default(autoincrement())
+  DESCRIPCION String? @db.NVarChar(40)
+  Defecto     String? @db.NVarChar(300)
+}

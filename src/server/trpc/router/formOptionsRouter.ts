@@ -20,4 +20,22 @@ export const formOptionsRouter = router({
   getAllAcademicLevels: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.nIVEL_ACADEMICO_WEB.findMany();
   }),
+  getAllExperienceAreas: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.area_Experiencia_WEB.findMany();
+  }),
+  getAllCities: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.cIUDADES_WEB.findMany();
+  }),
+  getAllZones: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.zONAS_WEB.findMany();
+  }),
+  getAllMunicipios: publicProcedure
+    .input(z.number())
+    .query(({ ctx, input }) => {
+      return ctx.prisma.mUNICIPIOS_WEB.findMany({
+        where: {
+          IDPROVINCIA: input,
+        },
+      });
+    }),
 });

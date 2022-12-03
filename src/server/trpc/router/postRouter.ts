@@ -25,7 +25,7 @@ export const solicitudEmpleoPostRouter = router({
           label: z.string(),
           value: z.number(),
         }),
-        pais: z.object({
+        municipio: z.object({
           label: z.string().min(1),
           value: z.number().min(1),
         }),
@@ -33,20 +33,24 @@ export const solicitudEmpleoPostRouter = router({
           label: z.string(),
           value: z.number(),
         }),
-        ciudad: z.string(),
-        zona: z.string(),
+        ciudad: z.object({
+          label: z.string(),
+          value: z.number(),
+        }),
+        zona: z.object({
+          label: z.string(),
+          value: z.number(),
+        }),
         lenguaNativa: z
           .object({
             label: z.string(),
             value: z.number(),
           })
           .optional(),
-        tieneDependiente: z
-          .object({
-            label: z.string(),
-            value: z.string(),
-          })
-          .optional(),
+        tieneDependiente: z.object({
+          label: z.string(),
+          value: z.string(),
+        }),
         terms: z.literal(true),
       })
     )
@@ -70,12 +74,12 @@ export const solicitudEmpleoPostRouter = router({
           Telefono2: input.telefono2,
           E_Mail: input.email,
           Nacionalidad: String(input.nacionalidad.value),
-          Pais: input.pais.value,
+          Municipio: String(input.municipio.value),
           Provincia: String(input.provincia.value),
-          Ciudad: input.ciudad,
-          Zona_Descripcion: input.zona,
+          Ciudad: String(input.ciudad.value),
+          Zona: String(input.zona.value),
           Lengua_Nativa: input.lenguaNativa?.value,
-          TieneDependiente: String(input.tieneDependiente?.value),
+          TieneDependiente: String(input.tieneDependiente.value),
         },
       });
       return post;

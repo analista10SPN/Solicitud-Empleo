@@ -47,22 +47,32 @@ const schema = z.object({
     },
     { required_error: "Debe indicar su nacionalidad" }
   ),
-  pais: object(
+  //REMOVER PAIS Y AJUSTAR REGISTROS PROVINCIA -> CIUDAD
+  municipio: object(
     {
       label: string().min(1),
       value: number().min(1),
     },
-    { required_error: "Debe indicar su pais de residencia" }
+    { required_error: "Debe indicar su municipio" }
   ),
   provincia: object(
     {
       label: string().min(1),
       value: number().min(1),
     },
-    { required_error: "Debe indicar su provincia de residencia" }
+    { required_error: "Debe indicar su provincia" }
   ),
-  ciudad: string().min(3, { message: "La ciudad es requerida" }),
-  zona: string(),
+  ciudad: object(
+    {
+      label: string().min(1),
+      value: number().min(1),
+    },
+    { required_error: "Debe indicar su ciudad" }
+  ),
+  zona: object({
+    label: string(),
+    value: number(),
+  }).optional(),
   lenguaNativa: object({
     label: string().optional(),
     value: number().optional(),
@@ -121,9 +131,11 @@ export default function DatosPersonales({
 
   const nacionalidades = trpc.formOptions.getAllNationalities.useQuery();
 
-  const paises = trpc.formOptions.getAllCountries.useQuery();
+  const ciudades = trpc.formOptions.getAllCities.useQuery();
 
   const provincias = trpc.formOptions.getAllDominicanProvinces.useQuery();
+
+  const zonas = trpc.formOptions.getAllZones.useQuery();
 
   const idiomas = trpc.formOptions.getAllLanguages.useQuery();
 
@@ -133,16 +145,26 @@ export default function DatosPersonales({
 
   const nacionalidadesOpciones: unknown[] = [];
 
-  const paisesOpciones: unknown[] = [];
+  const ciudadesOpciones: unknown[] = [];
 
   const provinciasOpciones: unknown[] = [];
+
+  const municipiosOpciones: unknown[] = [];
+
+  const zonasOpciones: unknown[] = [];
 
   const idiomasOpciones: unknown[] = [];
 
   /**  */
 
   //Valor seleccionado de pais para filtrar las opciones de provincias
-  const watchFields = watch(["pais"]);
+  const watchFields = watch(["pais", "provincia"]);
+
+  //Llamada al API EN CASCADA
+
+  const municipios = trpc.formOptions.getAllMunicipios.useQuery(
+    watchFields[1]?.value
+  );
 
   /**Insercion de objetos con atributos value,label a utilizar en los Selects */
 
@@ -155,29 +177,38 @@ export default function DatosPersonales({
     }
   });
 
-  paises.data?.forEach((pais) => {
-    if (pais.Codigo > 0) {
-      paisesOpciones.push({
-        value: pais.Codigo,
-        label: pais.Descripcion,
+  ciudades.data?.forEach((ciudad) => {
+    if (ciudad.Codigo > 0) {
+      ciudadesOpciones.push({
+        value: ciudad.Codigo,
+        label: ciudad.Descripcion,
+      });
+    }
+  });
+
+  zonas.data?.forEach((zona) => {
+    if (zona.CODIGO > 0) {
+      zonasOpciones.push({
+        value: zona.CODIGO,
+        label: zona.DESCRIPCION,
       });
     }
   });
 
   provincias.data?.forEach((provincia) => {
-    if (
-      provincia.CODIGO > 0 &&
-      provincia.CODIGO < 33 &&
-      watchFields[0]?.value === 1
-    ) {
+    if (provincia.CODIGO > 0) {
       provinciasOpciones.push({
         value: provincia.CODIGO,
         label: provincia.DESCRIPCION,
       });
-    } else if (watchFields[0]?.value !== 1 && provincia.CODIGO > 32) {
-      provinciasOpciones.push({
-        value: provincia.CODIGO,
-        label: provincia.DESCRIPCION,
+    }
+  });
+
+  municipios.data?.forEach((municipio) => {
+    if (municipio.CODIGO > 0) {
+      municipiosOpciones.push({
+        value: municipio.CODIGO,
+        label: municipio.DESCRIPCION,
       });
     }
   });
@@ -406,7 +437,57 @@ export default function DatosPersonales({
           </div>
         </div>
 
+        {/* NO CHANGES UPWARDS */}
+
         {/* ROW 5 */}
+
+        <div className="justify-between p-2 lg:flex lg:pt-6">
+          <div className="block">
+            <p className="text-md text-[color:var(--fontColor)]">
+              Fecha Nacimiento <b className="text-red-500">*</b>
+            </p>
+            <input
+              type="date"
+              max={`${new Date().getFullYear() - edadMinima}-${
+                new Date().getMonth() + 1
+              }-${
+                new Date().getDate().toString().length === 1 ? "0" : ""
+              }${new Date().getDate()}`}
+              {...register("fechaNacimiento")}
+              className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
+            />
+            {errors?.fechaNacimiento && (
+              <span className="block text-sm text-red-500">
+                {errors.fechaNacimiento.message?.toString()}
+              </span>
+            )}
+          </div>
+
+          <div className="block justify-start pt-4 lg:pt-0">
+            <p className="text-md text-[color:var(--fontColor)]">
+              Nacionalidad <b className="text-red-500">*</b>
+            </p>
+            <Controller
+              name="nacionalidad"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
+                  {...field}
+                  options={nacionalidadesOpciones}
+                />
+              )}
+            />
+            {errors?.nacionalidad && (
+              <span className="block text-sm text-red-500">
+                {errors.nacionalidad.message?.toString()}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* NEW ROW 6 */}
 
         <div className="justify-between p-2 lg:flex lg:pt-6">
           <div className="block">
@@ -428,25 +509,117 @@ export default function DatosPersonales({
 
           <div className="block pt-4 lg:pt-0">
             <p className="text-md text-[color:var(--fontColor)]">
-              Fecha Nacimiento <b className="text-red-500">*</b>
+              Lengua Nativa
             </p>
-            <input
-              type="date"
-              max={`${new Date().getFullYear() - edadMinima}-${
-                new Date().getMonth() + 1
-              }-${new Date().getDate()}`}
-              {...register("fechaNacimiento")}
-              className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
+            <Controller
+              name="lenguaNativa"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
+                  {...field}
+                  options={idiomasOpciones}
+                />
+              )}
             />
-            {errors?.fechaNacimiento && (
+          </div>
+        </div>
+
+        {/* NEW ROW 7 */}
+
+        <div className="justify-between p-2 lg:flex lg:pt-6">
+          <div className="block justify-start">
+            <p className="text-md text-[color:var(--fontColor)]">
+              Provincia <b className="text-red-500">*</b>
+            </p>
+            <Controller
+              name="provincia"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
+                  {...field}
+                  options={provinciasOpciones}
+                />
+              )}
+            />
+            {errors?.provincia && (
               <span className="block text-sm text-red-500">
-                {errors.fechaNacimiento.message?.toString()}
+                {errors.provincia.message?.toString()}
+              </span>
+            )}
+          </div>
+
+          <div className="block justify-start pt-4 lg:pt-0">
+            <p className="text-md text-[color:var(--fontColor)]">
+              Municipio <b className="text-red-500">*</b>
+            </p>
+            <Controller
+              name="municipio"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className={`w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60`}
+                  {...field}
+                  options={municipiosOpciones}
+                />
+              )}
+            />
+            {errors?.municipio && (
+              <span className="block text-sm text-red-500">
+                {errors.municipio.message?.toString()}
               </span>
             )}
           </div>
         </div>
 
-        {/* ROW 6 */}
+        {/* NEW ROW 8 */}
+
+        <div className="justify-between p-2 lg:flex lg:pt-6">
+          <div className="block justify-start">
+            <p className="text-md text-[color:var(--fontColor)]">
+              Ciudad <b className="text-red-500">*</b>
+            </p>
+            <Controller
+              name="ciudad"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
+                  {...field}
+                  options={ciudadesOpciones}
+                />
+              )}
+            />
+            {errors?.ciudad && (
+              <span className="block text-sm text-red-500">
+                {errors.ciudad.message?.toString()}
+              </span>
+            )}
+          </div>
+
+          <div className="block justify-start pt-4 lg:pt-0">
+            <p className="text-md text-[color:var(--fontColor)]">Zona</p>
+            <Controller
+              name="zona"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  placeholder="Seleccione..."
+                  className={`w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60`}
+                  {...field}
+                  options={zonasOpciones}
+                />
+              )}
+            />
+          </div>
+        </div>
+
+        {/* NEW ROW 9 (DIRECCION) */}
         <div className="justify-between p-2 lg:flex lg:pt-6">
           <div className="block">
             <p className="text-md text-[color:var(--fontColor)]">
@@ -472,7 +645,7 @@ export default function DatosPersonales({
           </div>
         </div>
 
-        {/* ROW 7 */}
+        {/* ROW 10 */}
         <div className="justify-between p-2 lg:flex lg:pt-6">
           <div className="block">
             <p className="text-md text-[color:var(--fontColor)]">
@@ -528,7 +701,7 @@ export default function DatosPersonales({
           </div>
         </div>
 
-        {/* ROW 8 */}
+        {/* ROW 11 */}
         <div className="justify-between p-2 lg:flex lg:pt-6">
           <div className="block">
             <p className="text-md text-[color:var(--fontColor)]">
@@ -551,130 +724,6 @@ export default function DatosPersonales({
                 {errors.email.message?.toString()}
               </span>
             )}
-          </div>
-
-          <div className="block justify-start pt-4 lg:pt-0">
-            <p className="text-md text-[color:var(--fontColor)]">
-              Nacionalidad <b className="text-red-500">*</b>
-            </p>
-            <Controller
-              name="nacionalidad"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  placeholder="Seleccione..."
-                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
-                  {...field}
-                  options={nacionalidadesOpciones}
-                />
-              )}
-            />
-            {errors?.nacionalidad && (
-              <span className="block text-sm text-red-500">
-                {errors.nacionalidad.message?.toString()}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* ROW 9 */}
-        <div className="justify-between p-2 lg:flex lg:pt-6">
-          <div className="block justify-start">
-            <p className="text-md text-[color:var(--fontColor)]">
-              Pais <b className="text-red-500">*</b>
-            </p>
-            <Controller
-              name="pais"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  placeholder="Seleccione..."
-                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
-                  {...field}
-                  options={paisesOpciones}
-                />
-              )}
-            />
-            {errors?.pais && (
-              <span className="block text-sm text-red-500">
-                {errors.pais.message?.toString()}
-              </span>
-            )}
-          </div>
-
-          <div className="block justify-start pt-4 lg:pt-0">
-            <p className="text-md text-[color:var(--fontColor)]">
-              Provincia <b className="text-red-500">*</b>
-            </p>
-            <Controller
-              name="provincia"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  placeholder="Seleccione..."
-                  className={`w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60`}
-                  {...field}
-                  options={provinciasOpciones}
-                />
-              )}
-            />
-            {errors?.provincia && (
-              <span className="block text-sm text-red-500">
-                {errors.provincia.message?.toString()}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* ROW 10 */}
-
-        <div className="justify-between p-2 lg:flex lg:pt-6">
-          <div className="block justify-start">
-            <p className="text-md text-[color:var(--fontColor)]">
-              Ciudad <b className="text-red-500">*</b>
-            </p>
-            <input
-              type="text"
-              maxLength={30}
-              {...register("ciudad")}
-              className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
-            />
-            {errors?.ciudad && (
-              <span className="block text-sm text-red-500">
-                {errors.ciudad.message?.toString()}
-              </span>
-            )}
-          </div>
-
-          <div className="block justify-start pt-4 lg:pt-0">
-            <p className="text-md text-[color:var(--fontColor)]">Zona</p>
-            <input
-              type="text"
-              maxLength={50}
-              {...register("zona")}
-              className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
-            />
-          </div>
-        </div>
-
-        {/* ROW 11 */}
-        <div className="justify-between p-2 lg:flex lg:pt-6">
-          <div className="block justify-start">
-            <p className="text-md text-[color:var(--fontColor)]">
-              Lengua Nativa
-            </p>
-            <Controller
-              name="lenguaNativa"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  placeholder="Seleccione..."
-                  className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
-                  {...field}
-                  options={idiomasOpciones}
-                />
-              )}
-            />
           </div>
 
           <div className="block justify-start pt-4 lg:pt-0">

@@ -130,10 +130,7 @@ export default function Dependientes({
     const uniqueIds = new Set(dependientesWithNewValue.map((v) => v.cedula));
     console.log(uniqueValues, dependientesWithNewValue);
 
-    if (
-      uniqueIds.size < dependientesWithNewValue.length &&
-      formValues?.cedula?.length > 0
-    ) {
+    if (uniqueIds.size < dependientesWithNewValue.length) {
       console.log("duplicates found");
       setOpenDuplicateAlert(true);
       return;

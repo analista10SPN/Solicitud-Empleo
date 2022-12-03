@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import StepperController from "./stepperController";
 import DatosPersonales from "./steps/datosPersonales";
 import Dependientes from "./steps/dependientes";
+import ExperienciaLaboral from "./steps/experienciaLaboral";
 import parameters from "../../personalization/parameters.json";
 import { trpc } from "../../utils/trpc";
 import Sent from "./sent";
@@ -18,6 +19,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
 
   const [results, setResults] = useState<any>({});
   const [dependientes, setDependientes] = useState<any>([]);
+  const [experienciasLaborales, setExperienciasLaborales] = useState<any>([]);
   const [posted, setPosted] = useState<boolean>(false);
 
   const handleClick = (direction: string) => {
@@ -100,6 +102,12 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
               submit={false}
             />
           </div>
+          // <ExperienciaLaboral
+          //   step={step}
+          //   setCurrentStep={setCurrentStep}
+          //   experiencias={experienciasLaborales}
+          //   setExperiencias={setExperienciasLaborales}
+          // />
         );
       case 4:
         return (
