@@ -6,6 +6,7 @@ import ExperienciaLaboral from "./steps/experienciaLaboral";
 import parameters from "../../personalization/parameters.json";
 import { trpc } from "../../utils/trpc";
 import Sent from "./sent";
+import FormacionAcademica from "./steps/formacionAcademica";
 
 interface formProps {
   step: number;
@@ -20,6 +21,9 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
   const [results, setResults] = useState<any>({});
   const [dependientes, setDependientes] = useState<any>([]);
   const [experienciasLaborales, setExperienciasLaborales] = useState<any>([]);
+  const [formacionAcademicaArray, setFormacionAcademicaArray] = useState<any>(
+    []
+  );
   const [posted, setPosted] = useState<boolean>(false);
 
   const handleClick = (direction: string) => {
@@ -42,6 +46,9 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
     if (newStep > parameters.steps.length && !posted) {
       try {
         results.cedula = String(results?.cedula)?.replaceAll("-", "");
+        if (results.zona === undefined) {
+          results.zona = { label: "", value: 0 };
+        }
         postResult.mutate(results);
         setPosted(true);
       } catch (cause) {
@@ -49,22 +56,59 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
       }
     }
   };
+  const postFormacionAcademica =
+    trpc.solicitudEmpleoPost.formacionAcademica.useMutation({
+      onSuccess(results) {
+        console.log("FORMACION ACADEMICA POST", results);
+        setCurrentStep(parameters.steps.length + 1);
+      },
+    });
+
+  const postExperienciasLaborales =
+    trpc.solicitudEmpleoPost.experienciaLaboral.useMutation({
+      onSuccess(results) {
+        console.log("EXPERIENCIA LABORAL POST", results);
+      },
+    });
 
   const postDependientes = trpc.solicitudEmpleoPost.dependientes.useMutation({
     onSuccess(results) {
       console.log("DEPENDIENTES POST", results);
-      setCurrentStep(parameters.steps.length + 1);
+      // setCurrentStep(parameters.steps.length + 1);
     },
   });
 
   const postResult = trpc.solicitudEmpleoPost.solicitudEmpleo.useMutation({
     onSuccess(result) {
       console.log("SOLICITUD POST", result);
+
       dependientes.forEach((dependiente: any) => {
         dependiente.codigo_solicitud = result.Numero;
         dependiente.cedula = String(dependiente?.cedula)?.replaceAll("-", "");
       });
+
+      experienciasLaborales.forEach((experiencia: any) => {
+        experiencia.codigo_solicitud = result.Numero;
+        experiencia.salarioInicial = String(experiencia?.salarioInicial)
+          ?.replace("$", "")
+          ?.replaceAll(",", "");
+        experiencia.salarioFinal = String(experiencia?.salarioFinal)
+          ?.replace("$", "")
+          ?.replaceAll(",", "");
+
+        if (isNaN(Number(experiencia.salarioInicial)))
+          experiencia.salarioInicial = String(0);
+        if (isNaN(Number(experiencia.salarioFinal)))
+          experiencia.salarioFinal = String(0);
+      });
+
+      formacionAcademicaArray.forEach((formacion: any) => {
+        formacion.codigo_solicitud = result.Numero;
+      });
+
       postDependientes.mutate(dependientes);
+      postExperienciasLaborales.mutate(experienciasLaborales);
+      postFormacionAcademica.mutate(formacionAcademicaArray);
     },
   });
 
@@ -92,35 +136,24 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 3:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
-          // <ExperienciaLaboral
-          //   step={step}
-          //   setCurrentStep={setCurrentStep}
-          //   experiencias={experienciasLaborales}
-          //   setExperiencias={setExperienciasLaborales}
-          // />
+          <ExperienciaLaboral
+            step={step}
+            setCurrentStep={setCurrentStep}
+            experiencias={experienciasLaborales}
+            setExperiencias={setExperienciasLaborales}
+            tieneDependiente={
+              results.tieneDependiente.value === "0" ? false : true
+            }
+          />
         );
       case 4:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
+          <FormacionAcademica
+            step={step}
+            setCurrentStep={setCurrentStep}
+            formacionAcademicaArray={formacionAcademicaArray}
+            setFormacionAcademicaArray={setFormacionAcademicaArray}
+          />
         );
       case 5:
         return (

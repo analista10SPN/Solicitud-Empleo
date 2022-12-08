@@ -1,9 +1,11 @@
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 import Select, { OptionsOrGroups } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import InputMask from "react-input-mask";
+import MaskedInput from "react-text-mask";
+import createNumberMask from "text-mask-addons/dist/createNumberMask";
 
 import {
   Column,
@@ -17,6 +19,8 @@ import {
   RowData,
 } from "@tanstack/react-table";
 import Alert from "./alert";
+import CurrencyInput from "react-currency-input-field";
+import Confirmation from "./confirmation";
 
 interface keyable {
   [key: string]: any;
@@ -33,7 +37,24 @@ interface tableProps {
   setData: any;
   columnProps: columnProperties[];
   selectOptions: any;
+  openDeleteConfirmationAlert: boolean;
+  setOpenDeleteConfirmationAlert: Dispatch<React.SetStateAction<boolean>>;
+  deleteConfirmation: boolean;
+  setDeleteConfirmation: Dispatch<React.SetStateAction<boolean>>;
 }
+
+const defaultMaskOptions = {
+  prefix: "$",
+  suffix: "",
+  includeThousandsSeparator: true,
+  thousandsSeparatorSymbol: ",",
+  allowDecimal: true,
+  decimalSymbol: ".",
+  decimalLimit: 2, // how many digits allowed after the decimal
+  integerLimit: 7, // limit length of integer numbers
+  allowNegative: false,
+  allowLeadingZeroes: false,
+};
 
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
@@ -51,9 +72,15 @@ export default function TableComponent({
   setData,
   columnProps,
   selectOptions,
+  openDeleteConfirmationAlert,
+  setOpenDeleteConfirmationAlert,
+  deleteConfirmation,
+  setDeleteConfirmation,
 }: tableProps) {
-  const [openDeleteConfirmationAlert, setOpenDeleteConfirmationAlert] =
+  const [openConfirmationAlert, setOpenConfirmationAlert] =
     useState<boolean>(false);
+
+  const [rowIndex, setRowIndex] = useState<number>(0);
 
   const deleteRow = (index: number) => {
     const popElement = data.at(index);
@@ -62,6 +89,7 @@ export default function TableComponent({
     });
 
     setData(dataAux);
+    setDeleteConfirmation(false);
     setOpenDeleteConfirmationAlert(true);
   };
 
@@ -138,7 +166,7 @@ export default function TableComponent({
             <input
               type={dataType}
               required={id === "nombre" ? true : false}
-              className="bg-gray-200 text-center"
+              className="text-md border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 text-center"
               value={value as string}
               onChange={(e) => {
                 if (e?.target?.value?.length === 0 && id === "nombre") {
@@ -153,7 +181,7 @@ export default function TableComponent({
           return (
             <textarea
               required={id === "nombre" ? true : false}
-              className="bg-gray-200 text-center"
+              className="border border-gray-300 bg-gray-200 lg:w-[20rem]"
               value={value as string}
               onChange={(e) => {
                 if (e?.target?.value?.length === 0 && id === "nombre") {
@@ -188,7 +216,7 @@ export default function TableComponent({
               mask="999-9999999-9"
               type="text"
               alwaysShowMask={false}
-              className="text-md w-24 border-t-0 border-r-0 border-l-0 border-b bg-gray-200 pt-1 focus:outline-0"
+              className="text-md min-w-max border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 text-center focus:outline-0"
               value={value as string}
               onChange={(e) => {
                 if (
@@ -214,7 +242,7 @@ export default function TableComponent({
               }}
               value={value as string}
               inputMode="numeric"
-              className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 pl-2 focus:outline-0 lg:w-[13.4rem]"
+              className="text-md min-w-max border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 pl-2 text-center focus:outline-0"
               onChange={(e) => {
                 if (
                   e?.target?.value?.length > 0 &&
@@ -229,14 +257,24 @@ export default function TableComponent({
           );
         case "salario":
           return (
-            <InputMask
-              mask="^[0-9].[0-9][0-9]"
-              type="text"
-              alwaysShowMask={false}
-              className="text-md w-24 border-t-0 border-r-0 border-l-0 border-b bg-gray-200 pt-1 focus:outline-0"
-              value={value as string}
+            <CurrencyInput
+              className="text-md min-w-max border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 text-center focus:outline-0"
+              defaultValue={0.0}
+              decimalsLimit={2}
+              decimalScale={2}
+              prefix={"$"}
+              value={
+                isNaN(value)
+                  ? 0
+                  : String(value).replace("$", "").replaceAll(",", "")
+              }
+              allowNegativeValue={false}
+              decimalSeparator={"."}
+              groupSeparator={","}
               onChange={(e) => {
-                setValue(e.target.value);
+                setValue(
+                  Number(e.target.value.replace("$", "").replaceAll(",", ""))
+                );
               }}
               onBlur={onBlur}
             />
@@ -300,13 +338,22 @@ export default function TableComponent({
 
   return (
     <>
+      <Confirmation
+        title="Eliminar Registro"
+        messages={["Está a punto de eliminar este registro. ¿Desea continuar?"]}
+        open={openConfirmationAlert}
+        setClose={setOpenConfirmationAlert}
+        setConfirmDeletion={setDeleteConfirmation}
+        deleteRow={deleteRow}
+        index={rowIndex}
+      />
       <Alert
         title="Registro Eliminado"
         messages={["Registro eliminado satisfactoriamente."]}
         open={openDeleteConfirmationAlert}
         setClose={() => setOpenDeleteConfirmationAlert(false)}
       />
-      <div className="w-72 overflow-x-scroll p-2 lg:w-[40rem]">
+      <div className="w-72 overflow-x-scroll p-2 lg:w-full lg:max-w-5xl">
         <div className="h-2 w-72 lg:w-[40rem]" />
         <table>
           <thead className="bg-[color:var(--stepperColor)] text-white">
@@ -338,7 +385,9 @@ export default function TableComponent({
                     <button
                       onClick={(e) => {
                         e.preventDefault();
-                        deleteRow(row?.index);
+                        // deleteRow(row?.index);
+                        setRowIndex(row?.index);
+                        setOpenConfirmationAlert(true);
                       }}
                     >
                       {" "}

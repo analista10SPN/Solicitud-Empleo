@@ -276,7 +276,7 @@ model Solicitud_Empleo_Web_Formacion_Acad {
   Fecha_Inicio          DateTime?            @db.Date
   Fecha_Termino         DateTime?            @db.Date
   Centro_Docente        String?              @db.NVarChar(60)
-  Ciudad_Centro_Docente String?              @db.NVarChar(60)
+  Ciudad_Centro_Docente Int?
   Carrera               String?              @db.NVarChar(60)
   Solicitud_Empleo_Web  Solicitud_Empleo_Web @relation(fields: [Codigo_Solicitud], references: [Numero], onUpdate: NoAction, map: "FK__Solicitud__Codig__639807CD")
 }

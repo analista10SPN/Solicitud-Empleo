@@ -81,6 +81,9 @@ export default function Dependientes({
 
   const [isSubmitSuccesfull, setIsSubmitSuccesfull] = useState<boolean>(false);
   const [openDuplicateAlert, setOpenDuplicateAlert] = useState<boolean>(false);
+  const [openDeleteConfirmationAlert, setOpenDeleteConfirmationAlert] =
+    useState<boolean>(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
 
   // API CALLS TO GET MENU OPTIONS DATA
 
@@ -197,7 +200,11 @@ export default function Dependientes({
 
       <form className="text-center text-sm" onSubmit={handleSubmit(onSave)}>
         {/* Form Box */}
-        <div className="mt-8 w-72 rounded-md border border-gray-300 p-4 text-left lg:w-full">
+        <div
+          className={`mt-8 w-72 rounded-md border border-gray-300 p-4 text-left lg:w-[40rem] ${
+            dependientes?.length > 0 ? "lg:ml-[15%]" : ""
+          }`}
+        >
           {/* Form Title */}
           <h2 className="pl-2 text-lg font-semibold text-[color:var(--fontColor)]">
             Dependientes
@@ -363,10 +370,15 @@ export default function Dependientes({
           </div>
         </div>
         {/* Table Component */}
-        {nivelesAcademicosOpciones?.length > 0 && dependientes?.length > 0 && (
+        {((nivelesAcademicosOpciones?.length > 0 && dependientes?.length > 0) ||
+          openDeleteConfirmationAlert) && (
           <TableComponent
             data={dependientes}
             setData={setDependientes}
+            openDeleteConfirmationAlert={openDeleteConfirmationAlert}
+            setOpenDeleteConfirmationAlert={setOpenDeleteConfirmationAlert}
+            deleteConfirmation={deleteConfirmation}
+            setDeleteConfirmation={setDeleteConfirmation}
             columnProps={[
               { name: "Nombre", property: "nombre", type: "text" },
               {

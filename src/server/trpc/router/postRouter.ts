@@ -77,7 +77,7 @@ export const solicitudEmpleoPostRouter = router({
           Municipio: String(input.municipio.value),
           Provincia: String(input.provincia.value),
           Ciudad: String(input.ciudad.value),
-          Zona: String(input.zona.value),
+          Zona: String(input.zona?.value),
           Lengua_Nativa: input.lenguaNativa?.value,
           TieneDependiente: String(input.tieneDependiente.value),
         },
@@ -121,6 +121,89 @@ export const solicitudEmpleoPostRouter = router({
               Id_Parentesco: dependiente.parentesco.value,
               Cedula: dependiente.cedula,
               NivelAcademico: dependiente.nivelAcademico.value,
+            };
+          }),
+        });
+      return post;
+    }),
+  experienciaLaboral: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          codigo_solicitud: z.number(),
+          nombreEmpresa: z.string(),
+          telefono: z.string(),
+          fechaInicio: z.string(),
+          fechaSalida: z.string().optional(),
+          salarioInicial: z.string().optional(),
+          salarioFinal: z.string().optional(),
+          funciones: z.string().optional(),
+          ultimoPuesto: z.string().optional(),
+          motivoSalida: z.string().optional(),
+          supervisor: z.string().optional(),
+          areaExperiencia: z
+            .object({
+              label: z.string(),
+              value: z.number(),
+            })
+            .optional(),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post =
+        await ctx.prisma.solicitud_Empleo_Web_Experiencia_Laboral.createMany({
+          data: input.map((experencia) => {
+            return {
+              Codigo_Solicitud: experencia.codigo_solicitud,
+              Nombre_Empresa: experencia.nombreEmpresa,
+              Telefono: experencia.telefono,
+              Fecha_Inicio: new Date(experencia?.fechaInicio),
+              Fecha_Salida: new Date(String(experencia?.fechaSalida)),
+              Salario_Inicial: Number(experencia.salarioInicial),
+              Salario_Final: Number(experencia.salarioFinal),
+              Funciones_A_Cargo: experencia.funciones,
+              Ultimo_Puesto: experencia.ultimoPuesto,
+              Motivo_Salida: experencia.motivoSalida,
+              Supervisor: experencia.supervisor,
+              Area_Experiencia: experencia.areaExperiencia?.value,
+            };
+          }),
+        });
+      return post;
+    }),
+  formacionAcademica: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          codigo_solicitud: z.number(),
+          centroDocente: z.string(),
+          carrera: z.string().optional(),
+          grado: z.object({
+            label: z.string(),
+            value: z.number(),
+          }),
+          ciudad: z.object({
+            label: z.string(),
+            value: z.number(),
+          }),
+          fechaInicio: z.string(),
+          fechaTermino: z.string(),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post =
+        await ctx.prisma.solicitud_Empleo_Web_Formacion_Acad.createMany({
+          data: input.map((formacion) => {
+            return {
+              Codigo_Solicitud: formacion.codigo_solicitud,
+              Centro_Docente: formacion.centroDocente,
+              Fecha_Inicio: new Date(formacion.fechaInicio).toISOString(),
+              Fecha_Termino: new Date(formacion.fechaTermino).toISOString(),
+              Ciudad_Centro_Docente: Number(formacion.ciudad.value),
+              Nivel_Academico: Number(formacion.grado.value),
+              Carrera: formacion?.carrera,
             };
           }),
         });

@@ -18,55 +18,48 @@ interface keyable {
 interface dependientesProps {
   step: number;
   setCurrentStep: Dispatch<SetStateAction<number>>;
-  dependientes: any[];
-  setDependientes: Dispatch<React.SetStateAction<any[]>>;
+  formacionAcademicaArray: any[];
+  setFormacionAcademicaArray: Dispatch<React.SetStateAction<any[]>>;
 }
 
 const schema = z.object({
-  nombre: string().min(1, { message: "El nombre es requerido" }),
-  cedula: string().regex(/^$|^[0-9]{3}?-?[0-9]{7}?-?[0-9]{1}?$/g, {
-    message: "Debe indicar una cédula válida (opcional)",
-  }),
-  sexo: object(
-    {
-      label: string(),
-      value: string(),
-    },
-    {
-      required_error: "Debe indicar el sexo",
-      invalid_type_error: "Debe indicar el sexo",
-    }
-  ),
-  nivelAcademico: object(
+  grado: object(
     {
       label: string().min(1),
       value: number().min(1),
     },
     {
-      required_error: "Debe indicar el nivel académico",
-      invalid_type_error: "Debe indicar el nivel académico",
+      required_error: "Debe indicar el grado académico",
+      invalid_type_error: "Debe indicar el grado académico",
     }
   ),
-  fechaNacimiento: string().min(1, {
-    message: "La fecha de nacimiento es requerida",
+  fechaInicio: string().min(1, {
+    message: "La fecha de inicio es requerida",
   }),
-  parentesco: object(
+  fechaTermino: string().min(1, {
+    message: "La fecha de término es requerida",
+  }),
+  centroDocente: string().min(1, {
+    message: "Debe indicar el nombre del centro docente",
+  }),
+  ciudad: object(
     {
       label: string(),
       value: number(),
     },
     {
-      required_error: "Debe indicar el parentesco",
-      invalid_type_error: "Debe indicar el parentesco",
+      required_error: "Debe indicar la ciudad del centro docente",
+      invalid_type_error: "Debe indicar la ciudad del centro docente",
     }
   ),
+  carrera: string().optional(),
 });
 
-export default function Dependientes({
+export default function FormacionAcademica({
   step,
   setCurrentStep,
-  dependientes,
-  setDependientes,
+  formacionAcademicaArray,
+  setFormacionAcademicaArray,
 }: dependientesProps) {
   const {
     register,
@@ -79,25 +72,27 @@ export default function Dependientes({
     resolver: zodResolver(schema),
   });
 
+  const [openDateConflictAlert, setOpenDateConflictAlert] =
+    useState<boolean>(false);
   const [isSubmitSuccesfull, setIsSubmitSuccesfull] = useState<boolean>(false);
   const [openDuplicateAlert, setOpenDuplicateAlert] = useState<boolean>(false);
+  const [openDeleteConfirmationAlert, setOpenDeleteConfirmationAlert] =
+    useState<boolean>(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
+
+  const watchFields = watch(["fechaInicio"]);
 
   // API CALLS TO GET MENU OPTIONS DATA
 
   const nivelesAcademico = trpc.formOptions.getAllAcademicLevels.useQuery();
 
-  const parentescos = trpc.formOptions.getAllRelationships.useQuery();
+  const ciudades = trpc.formOptions.getAllCities.useQuery();
 
   //MENU OPTIONS VARIABLES
 
   const nivelesAcademicosOpciones: unknown[] = [];
 
-  const parentescosOpciones: unknown[] = [];
-
-  const sexoOpciones = [
-    { label: "Femenino", value: "1" },
-    { label: "Masculino", value: "2" },
-  ];
+  const ciudadesOpciones: unknown[] = [];
 
   //FILLING IN MENU OPTIONS VARIABLES WITH DATA
 
@@ -110,44 +105,83 @@ export default function Dependientes({
     }
   });
 
-  parentescos.data?.forEach((parentesco) => {
-    if (parentesco.Parentesco_Codigo > 0) {
-      parentescosOpciones.push({
-        value: parentesco.Parentesco_Codigo,
-        label: parentesco.Descripcion,
+  ciudades.data?.forEach((ciudad) => {
+    if (ciudad.Codigo > 0) {
+      ciudadesOpciones.push({
+        value: ciudad.Codigo,
+        label: ciudad.Descripcion,
       });
     }
   });
 
   //Controller functions
   const onSave = (formValues: any) => {
-    console.log("State Results:", dependientes);
+    console.log("State Results:", formacionAcademicaArray);
     console.log("FORM VALUES:", formValues);
 
     //CHECK FOR DUPLICATE REGISTERS
-    const dependientesWithNewValue = [...dependientes, formValues];
-    const uniqueValues = new Set(dependientesWithNewValue.map((v) => v.nombre));
-    const uniqueIds = new Set(dependientesWithNewValue.map((v) => v.cedula));
-    console.log(uniqueValues, dependientesWithNewValue);
+    const formacionAcademicaArrayWithNewValue = [
+      ...formacionAcademicaArray,
+      formValues,
+    ];
+    const uniqueValues = new Set(
+      formacionAcademicaArrayWithNewValue.map((v) => v.grado?.value)
+    );
+    const uniqueIds = new Set(
+      formacionAcademicaArrayWithNewValue.map((v) => v.fechaInicio)
+    );
+    console.log(uniqueValues, formacionAcademicaArrayWithNewValue);
 
-    if (uniqueIds.size < dependientesWithNewValue.length) {
+    if (uniqueIds.size < formacionAcademicaArrayWithNewValue.length) {
       console.log("duplicates found");
-      setOpenDuplicateAlert(true);
+      setOpenDateConflictAlert(true);
       return;
-    } else if (uniqueValues.size < dependientesWithNewValue.length) {
-      const possibleDuplicate = dependientes.find(
-        (dependiente) => dependiente.nombre === formValues.nombre
+    } else if (uniqueValues.size < formacionAcademicaArrayWithNewValue.length) {
+      const possibleDuplicate = formacionAcademicaArray.find(
+        (formacion) => formacion.grado.value === formValues.grado.value
       );
-      if (possibleDuplicate?.cedula === formValues?.cedula) {
+      if (possibleDuplicate) {
         console.log("duplicates found");
         setOpenDuplicateAlert(true);
         return;
       }
     }
 
+    const startDate = new Date(formValues.fechaInicio);
+    const endDate = new Date(
+      formValues.fechaTermino.length > 0 ? formValues.fechaTermino : null
+    );
+
+    let invalidDate = false;
+    formacionAcademicaArray.forEach((formacionAcademica) => {
+      if (
+        startDate.getTime() >=
+          new Date(formacionAcademica.fechaInicio).getTime() &&
+        startDate.getTime() <
+          new Date(formacionAcademica.fechaTermino).getTime()
+      ) {
+        invalidDate = true;
+
+        return;
+      } else if (
+        endDate.getTime() >=
+          new Date(formacionAcademica.fechaInicio).getTime() &&
+        endDate.getTime() < new Date(formacionAcademica.fechaTermino).getTime()
+      ) {
+        invalidDate = true;
+
+        return;
+      }
+    });
+
+    if (invalidDate) {
+      setOpenDateConflictAlert(true);
+      return;
+    }
+
     //<--- IF NO DUPLICATES --->
 
-    setDependientes([...dependientes, formValues]);
+    setFormacionAcademicaArray([...formacionAcademicaArray, formValues]);
     setIsSubmitSuccesfull(true);
   };
 
@@ -166,12 +200,12 @@ export default function Dependientes({
   useEffect(() => {
     if (isSubmitSuccesfull) {
       reset({
-        nivelAcademico: null,
-        sexo: null,
-        parentesco: null,
-        nombre: "",
-        fechaNacimiento: "",
-        cedula: "",
+        grado: null,
+        fechaInicio: "",
+        fechaTermino: "",
+        centroDocente: "",
+        ciudad: null,
+        carrera: "",
       });
       resetCallBack();
     }
@@ -186,18 +220,29 @@ export default function Dependientes({
       <Alert
         title="Registro Duplicado"
         messages={[
-          "Está intentando ingresar un dependiente que ya existe en la tabla de Dependientes Adicionales",
+          "Está intentando ingresar un grado que ya existe en la tabla de Formación Académica.",
         ]}
         open={openDuplicateAlert}
         setClose={() => setOpenDuplicateAlert(false)}
       />
 
+      <Alert
+        title="Fecha Inválida"
+        messages={["Las fechas indicadas chocan con fechas ya registradas."]}
+        open={openDateConflictAlert}
+        setClose={() => setOpenDateConflictAlert(false)}
+      />
+
       <form className="text-center text-sm" onSubmit={handleSubmit(onSave)}>
         {/* Form Box */}
-        <div className="mt-8 w-72 rounded-md border border-gray-300 p-4 text-left lg:w-full">
+        <div
+          className={`mt-8 w-72 rounded-md border border-gray-300 p-4 text-left lg:w-[40rem] ${
+            formacionAcademicaArray?.length > 0 ? "lg:ml-[15%]" : ""
+          }`}
+        >
           {/* Form Title */}
           <h2 className="pl-2 text-lg font-semibold text-[color:var(--fontColor)]">
-            Dependientes
+            Formación Académica
           </h2>
           <span className="block pl-2 text-sm text-gray-500 lg:w-full">
             Los campos marcados con
@@ -209,16 +254,23 @@ export default function Dependientes({
           <div className="justify-between p-2 pt-8 lg:flex">
             <div className="block">
               <p className="text-md text-[color:var(--fontColor)]">
-                Nombre Completo <b className="text-red-500">*</b>{" "}
+                Grado <b className="text-red-500">*</b>{" "}
               </p>
-              <textarea
-                maxLength={80}
-                {...register("nombre")}
-                className="text-md mt-2 h-10 w-full border border-gray-300 focus:outline-0 lg:mt-1 lg:h-8 lg:w-[35rem] lg:border-t-0 lg:border-r-0 lg:border-l-0 lg:border-b lg:pt-2"
+              <Controller
+                name="grado"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    placeholder="Seleccione..."
+                    className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
+                    {...field}
+                    options={nivelesAcademicosOpciones}
+                  />
+                )}
               />
-              {errors?.nombre && (
+              {errors?.grado && (
                 <span className="block text-sm text-red-500">
-                  {errors.nombre.message?.toString()}
+                  {errors.grado.message?.toString()}
                 </span>
               )}
             </div>
@@ -228,39 +280,44 @@ export default function Dependientes({
           <div className="justify-between p-2 lg:flex lg:pt-6">
             <div className="block justify-start">
               <p className="text-md text-[color:var(--fontColor)]">
-                Parentesco <b className="text-red-500">*</b>
+                Fecha de Inicio <b className="text-red-500">*</b>
               </p>
-              <Controller
-                name="parentesco"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    placeholder="Seleccione..."
-                    className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
-                    {...field}
-                    options={parentescosOpciones}
-                  />
-                )}
+              <input
+                type="date"
+                max={`${new Date().getFullYear()}-${
+                  new Date().getMonth() + 1
+                }-${
+                  new Date().getDate().toString().length === 1 ? "0" : ""
+                }${new Date().getDate()}`}
+                {...register("fechaInicio")}
+                className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
               />
-              {errors?.parentesco && (
+              {errors?.fechaInicio && (
                 <span className="block text-sm text-red-500">
-                  {errors.parentesco.message?.toString()}
+                  {errors.fechaInicio.message?.toString()}
                 </span>
               )}
             </div>
 
             <div className="block justify-start pt-4 lg:pt-0">
               <p className="text-md text-[color:var(--fontColor)]">
-                Fecha Nacimiento <b className="text-red-500">*</b>
+                Fecha de Término <b className="text-red-500">*</b>
               </p>
               <input
                 type="date"
-                {...register("fechaNacimiento")}
+                min={watchFields[0]?.length > 0 ? watchFields[0] : ""}
+                disabled={watchFields[0]?.length === 0 ? true : false}
+                max={`${new Date().getFullYear()}-${
+                  new Date().getMonth() + 1
+                }-${
+                  new Date().getDate().toString().length === 1 ? "0" : ""
+                }${new Date().getDate()}`}
+                {...register("fechaTermino")}
                 className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
               />
-              {errors?.fechaNacimiento && (
+              {errors?.fechaTermino && (
                 <span className="block text-sm text-red-500">
-                  {errors.fechaNacimiento.message?.toString()}
+                  {errors.fechaTermino.message?.toString()}
                 </span>
               )}
             </div>
@@ -270,40 +327,41 @@ export default function Dependientes({
 
           <div className="justify-between p-2 lg:flex lg:pt-6">
             <div className="block">
-              <p className="text-md text-[color:var(--fontColor)]">Cédula</p>
-              <InputMask
-                mask="999-9999999-9"
+              <p className="text-md text-[color:var(--fontColor)]">
+                Centro Docente <b className="text-red-500">*</b>
+              </p>
+              <input
                 type="text"
-                alwaysShowMask={false}
-                {...register("cedula")}
+                maxLength={60}
+                {...register("centroDocente")}
                 className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
               />
-              {errors?.cedula && (
+              {errors?.centroDocente && (
                 <span className="block text-sm text-red-500">
-                  {errors?.cedula.message?.toString()}
+                  {errors.centroDocente.message?.toString()}
                 </span>
               )}
             </div>
 
             <div className="block justify-start pt-4 lg:pt-0">
               <p className="text-md text-[color:var(--fontColor)]">
-                Sexo <b className="text-red-500">*</b>
+                Ciudad del Centro Docente <b className="text-red-500">*</b>
               </p>
               <Controller
-                name="sexo"
+                name="ciudad"
                 control={control}
                 render={({ field }) => (
                   <Select
                     placeholder="Seleccione..."
                     className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
                     {...field}
-                    options={sexoOpciones}
+                    options={ciudadesOpciones}
                   />
                 )}
               />
-              {errors?.sexo && (
+              {errors?.ciudad && (
                 <span className="block text-sm text-red-500">
-                  {errors.sexo.message?.toString()}
+                  {errors.ciudad.message?.toString()}
                 </span>
               )}
             </div>
@@ -314,27 +372,15 @@ export default function Dependientes({
           <div className="justify-between p-2 lg:flex lg:pt-6">
             <div className="block justify-start">
               <p className="text-md text-[color:var(--fontColor)]">
-                Nivel Académico <b className="text-red-500">*</b>
+                Carrera o Especialidad
               </p>
 
-              <Controller
-                name="nivelAcademico"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    key={"nivelAcademicoKey"}
-                    placeholder="Seleccione..."
-                    className="w-full border-0 pt-1 outline-none focus:outline-0 lg:w-60"
-                    {...field}
-                    options={nivelesAcademicosOpciones}
-                  />
-                )}
+              <input
+                type="text"
+                maxLength={60}
+                {...register("carrera")}
+                className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
               />
-              {errors?.nivelAcademico && (
-                <span className="block text-sm text-red-500">
-                  {errors.nivelAcademico.message?.toString()}
-                </span>
-              )}
             </div>
 
             <div className="hidden pt-4 lg:pt-0">
@@ -360,42 +406,56 @@ export default function Dependientes({
           </div>
         </div>
         {/* Table Component */}
-        {nivelesAcademicosOpciones?.length > 0 && dependientes?.length > 0 && (
+        {((nivelesAcademicosOpciones?.length > 0 &&
+          formacionAcademicaArray?.length > 0) ||
+          openDeleteConfirmationAlert) && (
           <TableComponent
-            data={dependientes}
-            setData={setDependientes}
+            data={formacionAcademicaArray}
+            setData={setFormacionAcademicaArray}
+            openDeleteConfirmationAlert={openDeleteConfirmationAlert}
+            setOpenDeleteConfirmationAlert={setOpenDeleteConfirmationAlert}
+            deleteConfirmation={deleteConfirmation}
+            setDeleteConfirmation={setDeleteConfirmation}
             columnProps={[
-              { name: "Nombre", property: "nombre", type: "text" },
               {
-                name: "Fecha Nacimiento",
-                property: "fechaNacimiento",
+                name: "Grado",
+                property: "grado.value",
+                type: "select",
+              },
+              {
+                name: "Fecha de Inicio",
+                property: "fechaInicio",
                 type: "date",
               },
               {
-                name: "Nivel Académico",
-                property: "nivelAcademico.value",
+                name: "Fecha de Término",
+                property: "fechaTermino",
+                type: "date",
+              },
+              {
+                name: "Centro Docente",
+                property: "centroDocente",
+                type: "text",
+              },
+              {
+                name: "Ciudad Centro Docente",
+                property: "ciudad.value",
                 type: "select",
               },
               {
-                name: "Parentesco",
-                property: "parentesco.value",
-                type: "select",
+                name: "Carrera o Especialidad",
+                property: "carrera",
+                type: "text",
               },
-              { name: "Cédula", property: "cedula", type: "cedula" },
-              { name: "Sexo", property: "sexo.value", type: "select" },
             ]}
             selectOptions={[
               {
-                id: "nivelAcademico",
+                id: "grado",
                 optionsArray: nivelesAcademicosOpciones,
               },
               {
-                id: "parentesco",
-                optionsArray: parentescosOpciones,
-              },
-              {
-                id: "sexo",
-                optionsArray: sexoOpciones,
+                id: "ciudad",
+                optionsArray: ciudadesOpciones,
               },
             ]}
           />
