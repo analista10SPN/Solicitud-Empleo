@@ -196,14 +196,19 @@ export default function TableComponent({
           return (
             <input
               type={dataType}
-              required={true}
+              required={id === "fechaSalida" ? false : true}
               className="bg-gray-200 text-center"
               value={value as string}
+              max={`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${
+                new Date().getDate().toString().length === 1 ? "0" : ""
+              }${new Date().getDate()}`}
               onChange={(e) => {
-                if (e?.target?.value?.split("-")?.length !== 3) {
-                  return;
-                } else if (e?.target?.value?.length === 0) {
-                  return;
+                if (id !== "fechaSalida") {
+                  if (e?.target?.value?.split("-")?.length !== 3) {
+                    return;
+                  } else if (e?.target?.value?.length === 0) {
+                    return;
+                  }
                 }
                 setValue(e.target.value);
               }}
@@ -242,14 +247,9 @@ export default function TableComponent({
               }}
               value={value as string}
               inputMode="numeric"
+              required={true}
               className="text-md min-w-max border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 pl-2 text-center focus:outline-0"
               onChange={(e) => {
-                if (
-                  e?.target?.value?.length > 0 &&
-                  e?.target?.value?.length < 9
-                ) {
-                  return;
-                }
                 setValue(e.target.value);
               }}
               onBlur={onBlur}
@@ -275,6 +275,18 @@ export default function TableComponent({
                 setValue(
                   Number(e.target.value.replace("$", "").replaceAll(",", ""))
                 );
+              }}
+              onBlur={onBlur}
+            />
+          );
+        case "checkbox":
+          return (
+            <input
+              className=" mx-10 rounded-md border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800 dark:focus:ring-blue-600"
+              type="checkbox"
+              checked={value}
+              onChange={() => {
+                setValue(!value);
               }}
               onBlur={onBlur}
             />

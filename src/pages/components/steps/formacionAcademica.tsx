@@ -15,7 +15,7 @@ interface keyable {
   [key: string]: any;
 }
 
-interface dependientesProps {
+interface formacionAcademicaProps {
   step: number;
   setCurrentStep: Dispatch<SetStateAction<number>>;
   formacionAcademicaArray: any[];
@@ -60,7 +60,7 @@ export default function FormacionAcademica({
   setCurrentStep,
   formacionAcademicaArray,
   setFormacionAcademicaArray,
-}: dependientesProps) {
+}: formacionAcademicaProps) {
   const {
     register,
     handleSubmit,

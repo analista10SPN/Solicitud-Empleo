@@ -110,16 +110,17 @@ export default function ExperienciaLaboral({
       console.log("duplicates found");
       setOpenDuplicateAlert(true);
       return;
-    } else if (uniqueValues.size < experienciasWithNewValue.length) {
-      const possibleDuplicate = experiencias.find(
-        (experiencia) => experiencia.nombreEmpresa === formValues.nombreEmpresa
-      );
-      if (possibleDuplicate) {
-        console.log("duplicates found");
-        setOpenDuplicateAlert(true);
-        return;
-      }
     }
+    // else if (uniqueValues.size < experienciasWithNewValue.length) {
+    //   const possibleDuplicate = experiencias.find(
+    //     (experiencia) => experiencia.nombreEmpresa === formValues.nombreEmpresa
+    //   );
+    //   if (possibleDuplicate) {
+    //     console.log("duplicates found");
+    //     setOpenDuplicateAlert(true);
+    //     return;
+    //   }
+    // }
     const startDate = new Date(formValues.fechaInicio);
     const endDate = new Date(
       formValues.fechaSalida.length > 0 ? formValues.fechaSalida : null

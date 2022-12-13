@@ -7,6 +7,7 @@ import parameters from "../../personalization/parameters.json";
 import { trpc } from "../../utils/trpc";
 import Sent from "./sent";
 import FormacionAcademica from "./steps/formacionAcademica";
+import Idiomas from "./steps/idiomas";
 
 interface formProps {
   step: number;
@@ -24,6 +25,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
   const [formacionAcademicaArray, setFormacionAcademicaArray] = useState<any>(
     []
   );
+  const [idiomasArray, setIdiomasArray] = useState<any>([]);
   const [posted, setPosted] = useState<boolean>(false);
 
   const handleClick = (direction: string) => {
@@ -56,11 +58,19 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
       }
     }
   };
+
+  const postIdiomas = trpc.solicitudEmpleoPost.idiomas.useMutation({
+    onSuccess(results) {
+      console.log("IDIOMAS POST", results);
+      setCurrentStep(parameters.steps.length + 1);
+    },
+  });
+
   const postFormacionAcademica =
     trpc.solicitudEmpleoPost.formacionAcademica.useMutation({
       onSuccess(results) {
         console.log("FORMACION ACADEMICA POST", results);
-        setCurrentStep(parameters.steps.length + 1);
+        // setCurrentStep(parameters.steps.length + 1);
       },
     });
 
@@ -106,9 +116,14 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         formacion.codigo_solicitud = result.Numero;
       });
 
+      idiomasArray.forEach((idioma: any) => {
+        idioma.codigo_solicitud = result.Numero;
+      });
+
       postDependientes.mutate(dependientes);
       postExperienciasLaborales.mutate(experienciasLaborales);
       postFormacionAcademica.mutate(formacionAcademicaArray);
+      postIdiomas.mutate(idiomasArray);
     },
   });
 
@@ -142,7 +157,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
             experiencias={experienciasLaborales}
             setExperiencias={setExperienciasLaborales}
             tieneDependiente={
-              results.tieneDependiente.value === "0" ? false : true
+              results?.tieneDependiente.value === "0" ? false : true
             }
           />
         );
@@ -157,16 +172,12 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 5:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
+          <Idiomas
+            step={step}
+            setCurrentStep={setCurrentStep}
+            idiomasArray={idiomasArray}
+            setIdiomasArray={setIdiomasArray}
+          />
         );
       case 6:
         return (

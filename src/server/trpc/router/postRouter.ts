@@ -209,4 +209,34 @@ export const solicitudEmpleoPostRouter = router({
         });
       return post;
     }),
+
+  idiomas: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          codigo_solicitud: z.number(),
+          idioma: z.object({
+            label: z.string().min(1),
+            value: z.number().min(1),
+          }),
+          lee: z.boolean(),
+          escribe: z.boolean(),
+          habla: z.boolean(),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post = await ctx.prisma.solicitudEmpIdiomas.createMany({
+        data: input.map((idioma) => {
+          return {
+            CodigoSolicitud: idioma.codigo_solicitud,
+            Idioma: idioma.idioma.label,
+            Lee: idioma.lee,
+            Habla: idioma.habla,
+            Escribe: idioma.escribe,
+          };
+        }),
+      });
+      return post;
+    }),
 });
