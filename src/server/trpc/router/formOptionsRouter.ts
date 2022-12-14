@@ -23,6 +23,9 @@ export const formOptionsRouter = router({
   getAllExperienceAreas: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.area_Experiencia_WEB.findMany();
   }),
+  getAllPositions: publicProcedure.query(({ ctx }) => {
+    return ctx.prisma.posiciones.findMany();
+  }),
   getAllCities: publicProcedure.query(({ ctx }) => {
     return ctx.prisma.cIUDADES_WEB.findMany();
   }),

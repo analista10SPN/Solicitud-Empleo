@@ -8,6 +8,7 @@ import { trpc } from "../../utils/trpc";
 import Sent from "./sent";
 import FormacionAcademica from "./steps/formacionAcademica";
 import Idiomas from "./steps/idiomas";
+import InformacionesAdicionales from "./steps/informacionesAdicionales";
 
 interface formProps {
   step: number;
@@ -51,6 +52,28 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         if (results.zona === undefined) {
           results.zona = { label: "", value: 0 };
         }
+        // if (results.salarioAspira === undefined) {
+        //   results.salarioAspira = 0;
+        // }
+        if (results.posicionAspira2 === undefined) {
+          results.posicionAspira2 = { label: "", value: 0 };
+        }
+        if (results.posicionAspira3 === undefined) {
+          results.posicionAspira3 = { label: "", value: 0 };
+        }
+        // if (results.comoSeEntero === undefined) {
+        //   results.comoSeEntero = { label: "", value: 0 };
+        // }
+        // if (results.parentescoConocido === undefined) {
+        //   results.parentescoConocido = { label: "", value: 0 };
+        // }
+        if (results.manejaMotor === undefined) {
+          results.manejaMotor = { label: "", value: 0 };
+        }
+        if (results.poseeVehiculo === undefined) {
+          results.poseeVehiculo = { label: "", value: 0 };
+        }
+
         postResult.mutate(results);
         setPosted(true);
       } catch (cause) {
@@ -157,7 +180,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
             experiencias={experienciasLaborales}
             setExperiencias={setExperienciasLaborales}
             tieneDependiente={
-              results?.tieneDependiente.value === "0" ? false : true
+              results?.tieneDependiente?.value === "0" ? false : true
             }
           />
         );
@@ -181,16 +204,12 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 6:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
+          <InformacionesAdicionales
+            step={step}
+            setCurrentStep={setCurrentStep}
+            results={results}
+            setResults={setResults}
+          />
         );
       case 7:
         return (

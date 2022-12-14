@@ -225,7 +225,9 @@ export default function DatosPersonales({
   const onSave = (formValues: any) => {
     console.log("State Results:", results);
     console.log("FORM VALUES:", formValues);
-    setResults(formValues);
+    setResults((prevState: any) => {
+      return { ...prevState, ...formValues };
+    });
     if (formValues?.tieneDependiente?.value === "1") {
       handleClick("next");
     } else {

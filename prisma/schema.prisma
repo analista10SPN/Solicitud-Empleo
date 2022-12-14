@@ -247,6 +247,9 @@ model Solicitud_Empleo_Web {
   Zona_Descripcion                         String?                                    @db.NVarChar(50)
   Ciudad                                   String?                                    @db.NVarChar(30)
   Lengua_Nativa                            Int?
+  Modalidad_Trabajo                        Int?
+  Parentesco_FamiliarAmigo                 Int?
+  Dispuesto_Trabajar                       Int?
   Solicitud_Empleo_Web_Experiencia_Laboral Solicitud_Empleo_Web_Experiencia_Laboral[]
   Solicitud_Empleo_Web_Formacion_Acad      Solicitud_Empleo_Web_Formacion_Acad[]
   Solicitud_Empleo_Web_Referencias         Solicitud_Empleo_Web_Referencias[]

@@ -37,10 +37,12 @@ export const solicitudEmpleoPostRouter = router({
           label: z.string(),
           value: z.number(),
         }),
-        zona: z.object({
-          label: z.string(),
-          value: z.number(),
-        }),
+        zona: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
         lenguaNativa: z
           .object({
             label: z.string(),
@@ -52,6 +54,168 @@ export const solicitudEmpleoPostRouter = router({
           value: z.string(),
         }),
         terms: z.literal(true),
+        preferenciaGeografica: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar su preferencia geográfica" }
+        ),
+        // CAMPO DB = DispuestoCambioResidencia
+        cambiarResidencia: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          {
+            required_error:
+              "Debe indicar si está dispuesto a cambiar residencia",
+          }
+        ),
+
+        // CAMPO DB = Empleado_anteriormente
+        empleadoAnteriormente: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar si ha sido empleado nuestro" }
+        ),
+
+        // CAMPO DB = Empleado_Actualmente
+        empleadoActualmente: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar si está empleado actualmente" }
+        ),
+        // CAMPO DB = Fecha_Disponible
+        fechaDisponible: z.string().min(1, {
+          message: "Debe indicar fecha de disponibilidad",
+        }),
+        // CAMPO DB (POR AGREGAR) = ModalidadTrabajo
+        modalidadTrabajo: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar la modalidad preferida" }
+        ),
+        // CAMPO DB = AreaLaboral
+        areaLaboral: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar el área laboral preferida" }
+        ),
+        //AGREGAR PERMISO DB TABLA Posiciones
+        // CAMPO DB = Posicion_aspira
+        posicionAspira1: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar la posición a la que aspira" }
+        ),
+        // CAMPO DB = Posicion_aspira2
+        posicionAspira2: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB = Posicion_aspira3
+        posicionAspira3: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB = Posiciones_Puede_Aplicar
+        posicionesPuedeAplicar: z.string().optional(),
+        // CAMPO DB = ComoTeEnteraste
+        comoSeEntero: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        //CAMPO DB = TipoContratacion
+        tipoContratacion: z.object(
+          {
+            label: z.string().min(1),
+            value: z.number().min(1),
+          },
+          { required_error: "Debe indicar el tipo de contratación" }
+        ),
+        // CAMPO DB = Nombre_FamiliarAmigo
+        parentescoConocido: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB (POR AGREGAR) = Parentesco_FamiliarAmigo
+        nombreConocido: z.string().optional(),
+        // CAMPO DB = Salario_aspira
+        salarioAspira: z.number().optional(),
+        // CAMPO DB = Horario_Disponible
+        horarioDisponible: z.object(
+          {
+            label: z.string(),
+            value: z.number(),
+          },
+          { required_error: "Debe indicar el horario disponible" }
+        ),
+        // CAMPO DB = Dispuesto_Trabajar_Horas_Extras
+        dispuestoTrabajarHorasExtras: z.object(
+          {
+            label: z.string(),
+            value: z.number(),
+          },
+          {
+            required_error:
+              "Debe indicar si está dispuesto a trabajar horas extras",
+          }
+        ),
+        // CAMPO DB (Agregar) = Dispuesto_Trabajar
+        dispuestoTrabajar: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB = Tipo_Licencia
+        tipoLicencia: z.object(
+          {
+            label: z.string(),
+            value: z.number(),
+          },
+          { required_error: "Debe indicar el tipo de licencia que posee" }
+        ),
+        // CAMPO DB = Maneja_Motor
+        manejaMotor: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB = Posee_Vehiculo
+        poseeVehiculo: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
+        // CAMPO DB = Medio_Transporte
+        medioTransporte: z
+          .object({
+            label: z.string(),
+            value: z.number(),
+          })
+          .optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -80,6 +244,30 @@ export const solicitudEmpleoPostRouter = router({
           Zona: String(input.zona?.value),
           Lengua_Nativa: input.lenguaNativa?.value,
           TieneDependiente: String(input.tieneDependiente.value),
+          PreferenciaGeografica: input.preferenciaGeografica.value,
+          DispuestoCambioResidencia: input.cambiarResidencia.value,
+          Empleado_anteriormente: String(input.empleadoAnteriormente.value),
+          Empleado_Actualmente: String(input.empleadoActualmente.value),
+          Fecha_Disponible: new Date(input.fechaDisponible).toISOString(),
+          Modalidad_Trabajo: input.modalidadTrabajo.value,
+          AreaLaboral: input.areaLaboral.value,
+          Posicion_aspira: String(input.posicionAspira1.value),
+          Posicion_aspira2: String(input?.posicionAspira2?.value),
+          Posicion_aspira3: String(input?.posicionAspira3?.value),
+          Posiciones_Puede_Aplicar: String(input?.posicionesPuedeAplicar),
+          ComoTeEnteraste: input.comoSeEntero?.value,
+          TipoContratacion: input.tipoContratacion.value,
+          Nombre_FamiliarAmigo: String(input?.nombreConocido),
+          Parentesco_FamiliarAmigo: input.parentescoConocido?.value,
+          Salario_aspira: input.salarioAspira,
+          Horario_Disponible: input.horarioDisponible.value,
+          Dispuesto_Trabajar_Horas_Extras:
+            input.dispuestoTrabajarHorasExtras.value,
+          Dispuesto_Trabajar: input.dispuestoTrabajar?.value,
+          Tipo_Licencia: input.tipoLicencia.value,
+          Maneja_Motor: String(input.manejaMotor?.value),
+          Posee_Vehiculo: String(input.poseeVehiculo?.value),
+          Medio_Transporte: input.medioTransporte?.value,
         },
       });
       return post;
