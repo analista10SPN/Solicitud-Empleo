@@ -9,6 +9,7 @@ import Sent from "./sent";
 import FormacionAcademica from "./steps/formacionAcademica";
 import Idiomas from "./steps/idiomas";
 import InformacionesAdicionales from "./steps/informacionesAdicionales";
+import ReferenciasPersonales from "./steps/referenciasPersonales";
 
 interface formProps {
   step: number;
@@ -26,6 +27,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
   const [formacionAcademicaArray, setFormacionAcademicaArray] = useState<any>(
     []
   );
+  const [referenciasPersonales, setReferenciasPersonales] = useState<any>([]);
   const [idiomasArray, setIdiomasArray] = useState<any>([]);
   const [posted, setPosted] = useState<boolean>(false);
 
@@ -52,21 +54,14 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         if (results.zona === undefined) {
           results.zona = { label: "", value: 0 };
         }
-        // if (results.salarioAspira === undefined) {
-        //   results.salarioAspira = 0;
-        // }
+
         if (results.posicionAspira2 === undefined) {
           results.posicionAspira2 = { label: "", value: 0 };
         }
         if (results.posicionAspira3 === undefined) {
           results.posicionAspira3 = { label: "", value: 0 };
         }
-        // if (results.comoSeEntero === undefined) {
-        //   results.comoSeEntero = { label: "", value: 0 };
-        // }
-        // if (results.parentescoConocido === undefined) {
-        //   results.parentescoConocido = { label: "", value: 0 };
-        // }
+
         if (results.manejaMotor === undefined) {
           results.manejaMotor = { label: "", value: 0 };
         }
@@ -82,10 +77,18 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
     }
   };
 
+  const postReferenciasPersonales =
+    trpc.solicitudEmpleoPost.referenciasPersonales.useMutation({
+      onSuccess(results) {
+        console.log("REFERENCIAS PERSONALES POST", results);
+        setCurrentStep(parameters.steps.length + 1);
+      },
+    });
+
   const postIdiomas = trpc.solicitudEmpleoPost.idiomas.useMutation({
     onSuccess(results) {
       console.log("IDIOMAS POST", results);
-      setCurrentStep(parameters.steps.length + 1);
+      // setCurrentStep(parameters.steps.length + 1);
     },
   });
 
@@ -143,10 +146,15 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         idioma.codigo_solicitud = result.Numero;
       });
 
+      referenciasPersonales.forEach((referencia: any) => {
+        referencia.codigo_solicitud = result.Numero;
+      });
+
       postDependientes.mutate(dependientes);
       postExperienciasLaborales.mutate(experienciasLaborales);
       postFormacionAcademica.mutate(formacionAcademicaArray);
       postIdiomas.mutate(idiomasArray);
+      postReferenciasPersonales.mutate(referenciasPersonales);
     },
   });
 
@@ -213,16 +221,12 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 7:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
+          <ReferenciasPersonales
+            step={step}
+            setCurrentStep={setCurrentStep}
+            referenciasPersonales={referenciasPersonales}
+            setReferenciasPersonales={setReferenciasPersonales}
+          />
         );
       case 8:
         return (

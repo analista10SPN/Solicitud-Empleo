@@ -492,6 +492,7 @@ export default function ExperienciaLaboral({
                 name: "Nombre de la Empresa",
                 property: "nombreEmpresa",
                 type: "text",
+                max: 60,
               },
               {
                 name: "Teléfono",
@@ -522,21 +523,25 @@ export default function ExperienciaLaboral({
                 name: "Funciones a su Cargo",
                 property: "funciones",
                 type: "textarea",
+                max: 1000,
               },
               {
                 name: "Último Puesto Desempeñado ",
                 property: "ultimoPuesto",
                 type: "text",
+                max: 60,
               },
               {
                 name: "Motivo de Salida ",
                 property: "motivoSalida",
                 type: "textarea",
+                max: 100,
               },
               {
                 name: "Supervisor ",
                 property: "supervisor",
                 type: "text",
+                max: 80,
               },
               {
                 name: "Área de Experiencia ",

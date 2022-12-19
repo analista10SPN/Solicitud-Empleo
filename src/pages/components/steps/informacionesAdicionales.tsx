@@ -156,7 +156,7 @@ const schema = z.object({
   }).optional(),
 });
 
-interface datosPersonalesProps {
+interface informacionesAdicionalesProps {
   step: number;
   setCurrentStep: Dispatch<SetStateAction<number>>;
   results: unknown;
@@ -168,7 +168,7 @@ export default function InformacionesAdicionales({
   setCurrentStep,
   results,
   setResults,
-}: datosPersonalesProps) {
+}: informacionesAdicionalesProps) {
   let storedResultsValues = {};
   if (results) {
     storedResultsValues = results;

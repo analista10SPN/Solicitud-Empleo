@@ -436,6 +436,7 @@ export default function FormacionAcademica({
                 name: "Centro Docente",
                 property: "centroDocente",
                 type: "text",
+                max: 60,
               },
               {
                 name: "Ciudad Centro Docente",
@@ -446,6 +447,7 @@ export default function FormacionAcademica({
                 name: "Carrera o Especialidad",
                 property: "carrera",
                 type: "text",
+                max: 60,
               },
             ]}
             selectOptions={[

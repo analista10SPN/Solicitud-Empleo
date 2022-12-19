@@ -380,7 +380,7 @@ export default function Dependientes({
             deleteConfirmation={deleteConfirmation}
             setDeleteConfirmation={setDeleteConfirmation}
             columnProps={[
-              { name: "Nombre", property: "nombre", type: "text" },
+              { name: "Nombre", property: "nombre", type: "text", max: 80 },
               {
                 name: "Fecha Nacimiento",
                 property: "fechaNacimiento",

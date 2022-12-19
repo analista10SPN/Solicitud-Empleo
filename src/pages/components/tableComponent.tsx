@@ -30,6 +30,7 @@ type columnProperties = {
   name: string;
   property: string;
   type: string;
+  max?: number;
 };
 
 interface tableProps {
@@ -102,16 +103,15 @@ export default function TableComponent({
         console.log(error);
       }
 
-      let dataType = "text";
+      let dataType: any;
 
-      dataType =
-        columnProps.find((column) => column.property === id)?.type || "text";
+      dataType = columnProps.find((column) => column.property === id);
 
       let isSelectInput = false;
       let options: OptionsOrGroups<any, any> | undefined = [];
       let selectedOption = {};
 
-      if (dataType === "select") {
+      if (dataType?.type === "select") {
         isSelectInput = true;
         selectOptions.forEach((_element: { id: any; optionsArray: any }) => {
           if (_element.id === id.split(".")[0]) {
@@ -146,7 +146,7 @@ export default function TableComponent({
         setValue(initialValue);
       }, [initialValue]);
 
-      switch (dataType) {
+      switch (dataType?.type) {
         case "select":
           return (
             <Select
@@ -164,8 +164,9 @@ export default function TableComponent({
         case "text":
           return (
             <input
-              type={dataType}
+              type={dataType?.type}
               required={id === "nombre" ? true : false}
+              maxLength={dataType?.max}
               className="text-md border-t-0 border-r-0 border-l-0 border-b border-gray-300 bg-gray-200 pt-1 text-center"
               value={value as string}
               onChange={(e) => {
@@ -183,6 +184,7 @@ export default function TableComponent({
               required={id === "nombre" ? true : false}
               className="border border-gray-300 bg-gray-200 lg:w-[20rem]"
               value={value as string}
+              maxLength={dataType?.max}
               onChange={(e) => {
                 if (e?.target?.value?.length === 0 && id === "nombre") {
                   return;
@@ -195,7 +197,7 @@ export default function TableComponent({
         case "date":
           return (
             <input
-              type={dataType}
+              type={dataType.type}
               required={id === "fechaSalida" ? false : true}
               className="bg-gray-200 text-center"
               value={value as string}

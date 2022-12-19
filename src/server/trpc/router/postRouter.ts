@@ -427,4 +427,43 @@ export const solicitudEmpleoPostRouter = router({
       });
       return post;
     }),
+  referenciasPersonales: publicProcedure
+    .input(
+      z.array(
+        z.object({
+          codigo_solicitud: z.number(),
+          nombre: z.string(),
+          telefono: z.string(),
+          tipoReferencia: z
+            .object({
+              label: z.string(),
+              value: z.number(),
+            })
+            .optional(),
+          email: z.string().optional(),
+          compania: z.string().optional(),
+          ocupacion: z.string().optional(),
+          parentesco: z.string().optional(),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post = await ctx.prisma.solicitud_Empleo_Web_Referencias.createMany(
+        {
+          data: input.map((referencia) => {
+            return {
+              Codigo_Solicitud: referencia.codigo_solicitud,
+              Nombre: referencia.nombre,
+              Telefono: referencia.telefono,
+              Compania: referencia?.compania,
+              Ocupacion: referencia?.ocupacion,
+              Parentesco: referencia?.parentesco,
+              E_Mail: referencia?.email,
+              Tipo_Referencia: referencia?.tipoReferencia?.value,
+            };
+          }),
+        }
+      );
+      return post;
+    }),
 });
