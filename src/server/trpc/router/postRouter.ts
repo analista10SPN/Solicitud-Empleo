@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { publicProcedure, router } from "../trpc";
+import superjson from "superjson";
 
 export const solicitudEmpleoPostRouter = router({
   solicitudEmpleo: publicProcedure
@@ -465,5 +466,56 @@ export const solicitudEmpleoPostRouter = router({
         }
       );
       return post;
+    }),
+
+  solicitudAnexo: publicProcedure
+    .input(
+      z.object({
+        codigo_solicitud: z.number(),
+        idAnexo: z.number(),
+        orden: z.number(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post: any = await ctx.prisma.solicitudWebAnexo.create({
+        data: {
+          Id_Solicitud: input.codigo_solicitud,
+          Id_Anexo: input.idAnexo,
+          Orden: input.orden,
+        },
+      });
+      return post;
+    }),
+
+  anexo: publicProcedure
+    .input(
+      z.object({
+        codigo_solicitud: z.number(),
+        nombre: z.string(),
+        extension: z.string(),
+        descripcion: z.string(),
+        binary: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const post: any = await ctx.prisma.anexo.create({
+        data: {
+          Nombre: input.nombre,
+          Extension: input.extension,
+          Descripcion: input.descripcion,
+          Imagen: Buffer.from(input.binary, "base64"),
+        },
+      });
+      const postRelation: any = await ctx.prisma.solicitudWebAnexo.create({
+        data: {
+          Id_Solicitud: input.codigo_solicitud,
+          Id_Anexo: Number(
+            JSON.parse(JSON.stringify(superjson.serialize(await post).json))
+              ?.IdAnexo
+          ),
+          Orden: 0,
+        },
+      });
+      return [superjson.serialize(post).json, postRelation];
     }),
 });

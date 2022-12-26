@@ -224,9 +224,10 @@ export default function InformacionesAdicionales({
   ];
 
   const tiposLicenciasOpciones = [
-    { value: 1, label: "Licencia de Motor" },
-    { value: 2, label: "Licencia de Vehículos Ligeros" },
-    { value: 3, label: "Licencia de Vehículos Pesados" },
+    { value: 1, label: "Ninguna" },
+    { value: 2, label: "Licencia de Motor" },
+    { value: 3, label: "Licencia de Vehículos Ligeros" },
+    { value: 4, label: "Licencia de Vehículos Pesados" },
   ];
 
   const medioTransporteOpciones = [

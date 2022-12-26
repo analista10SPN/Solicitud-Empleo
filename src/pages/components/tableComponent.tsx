@@ -4,8 +4,6 @@ import Select, { OptionsOrGroups } from "react-select";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import InputMask from "react-input-mask";
-import MaskedInput from "react-text-mask";
-import createNumberMask from "text-mask-addons/dist/createNumberMask";
 
 import {
   Column,
@@ -103,9 +101,9 @@ export default function TableComponent({
         console.log(error);
       }
 
-      let dataType: any;
-
-      dataType = columnProps.find((column) => column.property === id);
+      const dataType: any = columnProps.find(
+        (column) => column.property === id
+      );
 
       let isSelectInput = false;
       let options: OptionsOrGroups<any, any> | undefined = [];

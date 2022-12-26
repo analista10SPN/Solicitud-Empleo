@@ -31,13 +31,19 @@ const schema = z.object({
   }),
   compania: string().optional(),
   ocupacion: string().optional(),
-  email: string()
-    .email({ message: "Debe indicar un correo electrónico válido" })
-    .optional(),
-  tipoReferencia: object({
-    label: string(),
-    value: number(),
-  }).optional(),
+  email: string().email({
+    message: "Debe indicar un correo electrónico válido",
+  }),
+  tipoReferencia: object(
+    {
+      label: string(),
+      value: number(),
+    },
+    {
+      required_error: "Debe indicar el tipo de referencia",
+      invalid_type_error: "Debe indicar el tipo de referencia",
+    }
+  ),
   parentesco: string().optional(),
 });
 
@@ -138,7 +144,7 @@ export default function ReferenciasPersonales({
         nombre: "",
         compania: "",
         ocupacion: "",
-        correo: "",
+        email: "",
       });
       resetCallBack();
     }
@@ -172,7 +178,7 @@ export default function ReferenciasPersonales({
         {/* Form Box */}
         <div
           className={`mt-8 w-72 rounded-md border border-gray-300 p-4 text-left lg:w-[40rem] ${
-            referenciasPersonales?.length > 0 ? "lg:ml-[15%]" : ""
+            referenciasPersonales?.length > 0 ? "lg:ml-[18%]" : ""
           }`}
         >
           {/* Form Title */}
@@ -237,7 +243,7 @@ export default function ReferenciasPersonales({
 
             <div className="block justify-start pt-4 lg:pt-0">
               <p className="text-md text-[color:var(--fontColor)]">
-                Correo Electrónico
+                Correo Electrónico <b className="text-red-500">*</b>
               </p>
               <div className="flex">
                 <FontAwesomeIcon
@@ -251,6 +257,11 @@ export default function ReferenciasPersonales({
                   className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 pl-2 focus:outline-0 lg:w-[13.4rem]"
                 />
               </div>
+              {errors?.email && (
+                <span className="block text-sm text-red-500">
+                  {errors.email.message?.toString()}
+                </span>
+              )}
             </div>
           </div>
 
@@ -295,7 +306,7 @@ export default function ReferenciasPersonales({
 
             <div className="block justify-start pt-4 lg:pt-0">
               <p className="text-md text-[color:var(--fontColor)]">
-                Tipo de Referencia
+                Tipo de Referencia <b className="text-red-500">*</b>
               </p>
               <Controller
                 name="tipoReferencia"
@@ -309,6 +320,11 @@ export default function ReferenciasPersonales({
                   />
                 )}
               />
+              {errors?.tipoReferencia && (
+                <span className="block text-sm text-red-500">
+                  {errors.tipoReferencia.message?.toString()}
+                </span>
+              )}
             </div>
           </div>
 
