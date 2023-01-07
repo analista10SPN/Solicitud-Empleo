@@ -11,6 +11,8 @@ import Idiomas from "./steps/idiomas";
 import InformacionesAdicionales from "./steps/informacionesAdicionales";
 import ReferenciasPersonales from "./steps/referenciasPersonales";
 import AdjuntarDocumentos from "./steps/adjuntarDocumentos";
+import LoadingSpinner from "./loading";
+import Alert from "./alert";
 
 interface formProps {
   step: number;
@@ -42,9 +44,10 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
   const [posted, setPosted] = useState<boolean>(false);
 
   const [openWarning, setOpenWarning] = useState<boolean>(false);
+  const [openFailedPost, setOpenFailedPost] = useState<boolean>(false);
   const [warningTouched, setWarningTouched] = useState<boolean>(false);
 
-  const [solicitudNumero, setSolicitudNumero] = useState<number>(0);
+  const [openLoading, setOpenLoading] = useState<boolean>(false);
 
   const handleClick = (direction: string) => {
     let newStep = step;
@@ -66,6 +69,11 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
 
       if (newStep > parameters.steps.length && !posted) {
         try {
+          if (!validatePost.data) {
+            setOpenFailedPost(true);
+            return;
+          }
+          setOpenLoading(true);
           results.cedula = String(results?.cedula)?.replaceAll("-", "");
           if (results.zona === undefined) {
             results.zona = { label: "", value: 0 };
@@ -88,6 +96,8 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
           postResult.mutate(results);
           setPosted(true);
         } catch (cause) {
+          setOpenLoading(false);
+          alert(`Error en el envío: ${cause}`);
           console.error({ cause }, "Failed Post");
         }
       }
@@ -110,6 +120,27 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         return 0;
     }
   };
+
+  // let validatePost: boolean | undefined = true;
+
+  // if (results.cedula && results.posicionAspira1) {
+  //   trpc?.solicitudEmpleoPost?.validPost?.useQuery(
+  //     {
+  //       cedula: String(results.cedula),
+  //       posicion: String(results.posicionAspira1),
+  //     },
+  //     {
+  //       onSuccess(data) {
+  //         validatePost = data;
+  //       },
+  //     }
+  //   );
+  // }
+
+  const validatePost = trpc.solicitudEmpleoPost.validPost.useQuery({
+    cedula: results?.cedula ? String(results.cedula).replaceAll("-", "") : "",
+    posicion: String(results?.posicionAspira1?.value),
+  });
 
   const postAnexos = trpc.solicitudEmpleoPost.anexo.useMutation();
 
@@ -155,7 +186,6 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
   const postResult = trpc.solicitudEmpleoPost.solicitudEmpleo.useMutation({
     onSuccess(result) {
       console.log("SOLICITUD POST", result);
-      setSolicitudNumero(result.Numero);
 
       dependientes.forEach((dependiente: any) => {
         dependiente.codigo_solicitud = result.Numero;
@@ -209,6 +239,7 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
             onSuccess(e) {
               console.log("POST ANEXO", e);
               setCurrentStep(parameters.steps.length + 1);
+              setOpenLoading(false);
             },
           }
         );
@@ -314,14 +345,25 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 9:
         return (
-          <AdjuntarDocumentos
-            fileArray={fileArray}
-            setFileArray={setFileArray}
-            step={step}
-            openWarning={openWarning}
-            setOpenWarning={setOpenWarning}
-            handleClick={handleClick}
-          />
+          <>
+            <LoadingSpinner open={openLoading} />
+            <Alert
+              open={openFailedPost}
+              setClose={() => setOpenFailedPost(false)}
+              title="Solicitud Duplicada"
+              messages={[
+                "No puede aplicar a la misma posición el mismo día. Cambie de posición o espere al día de mañana para volver a aplicar.",
+              ]}
+            />
+            <AdjuntarDocumentos
+              fileArray={fileArray}
+              setFileArray={setFileArray}
+              step={step}
+              openWarning={openWarning}
+              setOpenWarning={setOpenWarning}
+              handleClick={handleClick}
+            />
+          </>
         );
       case 10:
         return <Sent email={results?.email} />;

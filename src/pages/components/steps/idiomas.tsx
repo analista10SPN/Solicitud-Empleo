@@ -60,6 +60,8 @@ export default function Idiomas({
   const [openDeleteConfirmationAlert, setOpenDeleteConfirmationAlert] =
     useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
+  const [openMinimumAlert, setOpenMinimumAlert] = useState<boolean>(false);
+  const [openMissingInfo, setOpenMissingInfo] = useState<boolean>(false);
 
   // API CALLS TO GET MENU OPTIONS DATA
 
@@ -104,7 +106,12 @@ export default function Idiomas({
       }
     }
 
-    //<--- IF NO DUPLICATES --->
+    if (!formValues.lee && !formValues.escribe && !formValues.habla) {
+      setOpenMissingInfo(true);
+      return;
+    }
+
+    //<--- IF NO DUPLICATES/MISSING INFO --->
 
     setIdiomasArray([...idiomasArray, formValues]);
     setIsSubmitSuccesfull(true);
@@ -115,6 +122,12 @@ export default function Idiomas({
 
     direction === "next" ? newStep++ : newStep--;
     // check if steps are within bounds
+
+    if (direction === "next" && idiomasArray?.length === 0) {
+      setOpenMinimumAlert(true);
+      return;
+    }
+
     newStep > 0 &&
       newStep <= parameters.steps.length &&
       setCurrentStep(newStep);
@@ -147,6 +160,22 @@ export default function Idiomas({
         ]}
         open={openDuplicateAlert}
         setClose={() => setOpenDuplicateAlert(false)}
+      />
+
+      <Alert
+        title="Indicar Nivel"
+        messages={[
+          "Debe indicar si habla, lee y/o escribe el idioma que está intentando agregar.",
+        ]}
+        open={openMissingInfo}
+        setClose={() => setOpenMissingInfo(false)}
+      />
+
+      <Alert
+        title="Mínimo Requerido"
+        messages={["Debe agregar un mínimo de 1 idioma para continuar."]}
+        open={openMinimumAlert}
+        setClose={() => setOpenMinimumAlert(false)}
       />
 
       <form className="text-center text-sm" onSubmit={handleSubmit(onSave)}>

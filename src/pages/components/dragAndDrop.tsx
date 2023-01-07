@@ -113,8 +113,37 @@ function DragDropFiles({
               }
             }}
             onChange={(e) => {
-              convertFile(e.target.files);
               if (e.target.files) {
+                let ext: any = e?.target?.files[0]?.name;
+                if (ext) ext = ext.match(/\.([^\.]+)$/)[1];
+                switch (ext) {
+                  case "jpg":
+                    break;
+                  case "jpeg":
+                    break;
+                  case "bmp":
+                    break;
+                  case "png":
+                    break;
+                  case "tif":
+                    break;
+                  case "pdf":
+                    break;
+                  default:
+                    alert(`No se permiten archivos tipo: ${ext}`);
+                    setFileBase64("");
+                    const fileArrayUpdated = fileArray.filter(
+                      (file) => file?.descripcion !== descripcion
+                    );
+                    setFileArray(fileArrayUpdated);
+
+                    const randomString = Math.random().toString(36);
+                    setInputKey(randomString);
+
+                    return;
+                }
+
+                convertFile(e.target.files);
                 setFile(e.target.files[0]);
               }
             }}

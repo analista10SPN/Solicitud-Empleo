@@ -199,7 +199,9 @@ export default function TableComponent({
               required={id === "fechaSalida" ? false : true}
               className="bg-gray-200 text-center"
               value={value as string}
-              max={`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${
+              max={`${new Date().getFullYear()}-${
+                new Date().getMonth().toString().length === 1 ? "0" : ""
+              }${new Date().getMonth() + 1}-${
                 new Date().getDate().toString().length === 1 ? "0" : ""
               }${new Date().getDate()}`}
               onChange={(e) => {

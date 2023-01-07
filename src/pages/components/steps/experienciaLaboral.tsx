@@ -283,8 +283,8 @@ export default function ExperienciaLaboral({
               <input
                 type="date"
                 max={`${new Date().getFullYear()}-${
-                  new Date().getMonth() + 1
-                }-${
+                  new Date().getMonth().toString().length === 1 ? "0" : ""
+                }${new Date().getMonth() + 1}-${
                   new Date().getDate().toString().length === 1 ? "0" : ""
                 }${new Date().getDate()}`}
                 {...register("fechaInicio")}
@@ -306,8 +306,8 @@ export default function ExperienciaLaboral({
                 min={watchFields[2]?.length > 0 ? watchFields[2] : ""}
                 disabled={watchFields[2]?.length === 0 ? true : false}
                 max={`${new Date().getFullYear()}-${
-                  new Date().getMonth() + 1
-                }-${
+                  new Date().getMonth().toString().length === 1 ? "0" : ""
+                }${new Date().getMonth() + 1}-${
                   new Date().getDate().toString().length === 1 ? "0" : ""
                 }${new Date().getDate()}`}
                 {...register("fechaSalida")}

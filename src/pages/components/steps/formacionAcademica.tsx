@@ -36,9 +36,7 @@ const schema = z.object({
   fechaInicio: string().min(1, {
     message: "La fecha de inicio es requerida",
   }),
-  fechaTermino: string().min(1, {
-    message: "La fecha de término es requerida",
-  }),
+  fechaTermino: string().optional(),
   centroDocente: string().min(1, {
     message: "Debe indicar el nombre del centro docente",
   }),
@@ -149,7 +147,7 @@ export default function FormacionAcademica({
 
     const startDate = new Date(formValues.fechaInicio);
     const endDate = new Date(
-      formValues.fechaTermino.length > 0 ? formValues.fechaTermino : null
+      formValues?.fechaTermino?.length > 0 ? formValues.fechaTermino : null
     );
 
     let invalidDate = false;
@@ -285,8 +283,8 @@ export default function FormacionAcademica({
               <input
                 type="date"
                 max={`${new Date().getFullYear()}-${
-                  new Date().getMonth() + 1
-                }-${
+                  new Date().getMonth().toString().length === 1 ? "0" : ""
+                }${new Date().getMonth() + 1}-${
                   new Date().getDate().toString().length === 1 ? "0" : ""
                 }${new Date().getDate()}`}
                 {...register("fechaInicio")}
@@ -301,25 +299,20 @@ export default function FormacionAcademica({
 
             <div className="block justify-start pt-4 lg:pt-0">
               <p className="text-md text-[color:var(--fontColor)]">
-                Fecha de Término <b className="text-red-500">*</b>
+                Fecha de Término
               </p>
               <input
                 type="date"
                 min={watchFields[0]?.length > 0 ? watchFields[0] : ""}
                 disabled={watchFields[0]?.length === 0 ? true : false}
                 max={`${new Date().getFullYear()}-${
-                  new Date().getMonth() + 1
-                }-${
+                  new Date().getMonth().toString().length === 1 ? "0" : ""
+                }${new Date().getMonth() + 1}-${
                   new Date().getDate().toString().length === 1 ? "0" : ""
                 }${new Date().getDate()}`}
                 {...register("fechaTermino")}
                 className="text-md w-full border-t-0 border-r-0 border-l-0 border-b border-gray-300 pt-1 focus:outline-0 lg:w-60"
               />
-              {errors?.fechaTermino && (
-                <span className="block text-sm text-red-500">
-                  {errors.fechaTermino.message?.toString()}
-                </span>
-              )}
             </div>
           </div>
 

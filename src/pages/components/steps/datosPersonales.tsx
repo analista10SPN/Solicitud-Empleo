@@ -451,8 +451,8 @@ export default function DatosPersonales({
             <input
               type="date"
               max={`${new Date().getFullYear() - edadMinima}-${
-                new Date().getMonth() + 1
-              }-${
+                new Date().getMonth().toString().length === 1 ? "0" : ""
+              }${new Date().getMonth() + 1}-${
                 new Date().getDate().toString().length === 1 ? "0" : ""
               }${new Date().getDate()}`}
               {...register("fechaNacimiento")}

@@ -221,6 +221,7 @@ export default function InformacionesAdicionales({
     { value: 1, label: "Fines de Semana" },
     { value: 2, label: "Días Feriados" },
     { value: 3, label: "Ambos" },
+    { value: 4, label: "Ninguno" },
   ];
 
   const tiposLicenciasOpciones = [
@@ -451,7 +452,9 @@ export default function InformacionesAdicionales({
             </p>
             <input
               type="date"
-              min={`${new Date().getFullYear()}-${new Date().getMonth() + 1}-${
+              min={`${new Date().getFullYear()}-${
+                new Date().getMonth().toString().length === 1 ? "0" : ""
+              }${new Date().getMonth() + 1}-${
                 new Date().getDate().toString().length === 1 ? "0" : ""
               }${new Date().getDate()}`}
               {...register("fechaDisponible")}

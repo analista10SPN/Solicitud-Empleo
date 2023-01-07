@@ -3,6 +3,43 @@ import { publicProcedure, router } from "../trpc";
 import superjson from "superjson";
 
 export const solicitudEmpleoPostRouter = router({
+  validPost: publicProcedure
+    .input(
+      z
+        .object({
+          cedula: z.string().nullable(),
+          posicion: z.string().nullable(),
+        })
+        .nullable()
+    )
+    .query(async ({ ctx, input }) => {
+      const solicitud = await ctx.prisma.solicitud_Empleo_Web.findMany({
+        where: {
+          AND: [
+            {
+              Cedula: input?.cedula,
+            },
+            {
+              Posicion_aspira: input?.posicion,
+            },
+          ],
+        },
+      });
+
+      let validPostValue = true;
+
+      solicitud.forEach((sol) => {
+        if (
+          sol.Fecha_Solicitud?.getDate() === new Date().getDate() &&
+          sol.Fecha_Solicitud?.getMonth() === new Date().getMonth() &&
+          sol.Fecha_Solicitud?.getFullYear() === new Date().getFullYear()
+        ) {
+          validPostValue = false;
+          return false;
+        }
+      });
+      return validPostValue;
+    }),
   solicitudEmpleo: publicProcedure
     .input(
       z.object({

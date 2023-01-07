@@ -84,6 +84,7 @@ export default function Dependientes({
   const [openDeleteConfirmationAlert, setOpenDeleteConfirmationAlert] =
     useState<boolean>(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState<boolean>(false);
+  const [openMinimumAlert, setOpenMinimumAlert] = useState<boolean>(false);
 
   // API CALLS TO GET MENU OPTIONS DATA
 
@@ -162,6 +163,12 @@ export default function Dependientes({
 
     direction === "next" ? newStep++ : newStep--;
     // check if steps are within bounds
+
+    if (direction === "next" && dependientes?.length === 0) {
+      setOpenMinimumAlert(true);
+      return;
+    }
+
     newStep > 0 &&
       newStep <= parameters.steps.length &&
       setCurrentStep(newStep);
@@ -196,6 +203,14 @@ export default function Dependientes({
         ]}
         open={openDuplicateAlert}
         setClose={() => setOpenDuplicateAlert(false)}
+      />
+      <Alert
+        title="Mínimo Requerido"
+        messages={[
+          "Debe agregar un mínimo de 1 dependiente adicional para continuar.",
+        ]}
+        open={openMinimumAlert}
+        setClose={() => setOpenMinimumAlert(false)}
       />
 
       <form className="text-center text-sm" onSubmit={handleSubmit(onSave)}>
