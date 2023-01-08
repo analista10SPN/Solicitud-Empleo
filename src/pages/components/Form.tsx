@@ -13,6 +13,7 @@ import ReferenciasPersonales from "./steps/referenciasPersonales";
 import AdjuntarDocumentos from "./steps/adjuntarDocumentos";
 import LoadingSpinner from "./loading";
 import Alert from "./alert";
+import Comentarios from "./steps/comentarios";
 
 interface formProps {
   step: number;
@@ -332,16 +333,12 @@ export default function FormComponent({ step, setCurrentStep }: formProps) {
         );
       case 8:
         return (
-          <div className="text-center text-xl">
-            {" "}
-            TO BE ADDED...
-            <StepperController
-              handleClick={handleClick}
-              currentStep={step}
-              steps={parameters.steps}
-              submit={false}
-            />
-          </div>
+          <Comentarios
+            step={step}
+            setCurrentStep={setCurrentStep}
+            results={results}
+            setResults={setResults}
+          />
         );
       case 9:
         return (

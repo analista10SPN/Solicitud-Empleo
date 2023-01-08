@@ -254,6 +254,7 @@ export const solicitudEmpleoPostRouter = router({
             value: z.number(),
           })
           .optional(),
+        comentarioEscrito: z.string().optional(),
       })
     )
     .mutation(async ({ input, ctx }) => {
@@ -306,6 +307,7 @@ export const solicitudEmpleoPostRouter = router({
           Maneja_Motor: String(input.manejaMotor?.value),
           Posee_Vehiculo: String(input.poseeVehiculo?.value),
           Medio_Transporte: input.medioTransporte?.value,
+          Comentario: input.comentarioEscrito,
         },
       });
       return post;
