@@ -6,6 +6,7 @@ import DragDropFiles from "../dragAndDrop";
 import StepperController from "../stepperController";
 import parameters from "../../../personalization/parameters.json";
 import Alert from "../alert";
+import VoiceRecorder from "../voiceRecorder";
 
 interface adjuntarDocumentosProps {
   fileArray: fileProps[];
@@ -80,6 +81,13 @@ const AdjuntarDocumentos = ({
                     </div>
                   );
                 })}
+                <span className="font-semibold text-[color:var(--fontColor)]">
+                  6. Mensaje de Voz
+                </span>
+                <VoiceRecorder
+                  fileArray={fileArray}
+                  setFileArray={setFileArray}
+                />
               </div>
             </div>
           </div>

@@ -14,6 +14,7 @@ import AdjuntarDocumentos from "./steps/adjuntarDocumentos";
 import LoadingSpinner from "./loading";
 import Alert from "./alert";
 import Comentarios from "./steps/comentarios";
+import VoiceRecorder from "./voiceRecorder";
 
 interface formProps {
   step: number;
